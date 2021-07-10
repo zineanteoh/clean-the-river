@@ -11,30 +11,25 @@
   </header>
 
   <main> 
-
-    <div id="hud">
+    <div class="hud">
       <!-- Keeps track of user's score and time -->
-      <p>Rubbish Cleared: 20</p>
-      <p>Time Left: 60 seconds</p>
+      <div class="hud-item">Rubbish Cleared: <span id="score">X</span></div>
+      <div class="hud-item">Time Left: <span id="time">X</span> seconds</div>
     </div>
 
-    <div id="equation">
+    <div class="equation">
       <!-- This is the box for equation -->
-      <p>3 + 4 = 7</p>
+      <span id="equation-left">3 + 4</span>
+      <span>=</span>
+      <!-- Press [Enter] to submit -->
+      <input type="text" class="userInput" maxlength="4">
     </div>
 
-    <div id="river">
-      <!-- This is where symbols and numbers are randomly added to the river -->
-      <p>2</p>
-      <p>7</p>
-      <p>÷</p>
-      <p>+</p>
-      <p>x</p>
-      <p>-</p>
+    <div class="river">
       
     </div>
 
-    <div id="player">
+    <div class="player">
       <!-- A simple, empty net in the middle of the screen. Animate when click -->
 
     </div>
