@@ -11,6 +11,7 @@
   padding: 0;
   box-sizing: border-box;
   font-family: sans-serif;
+  /* font-weight: bold; */
 } 
 
 body {
@@ -31,6 +32,7 @@ header > h1 {
   display: flex;
   justify-content: space-between;
   margin: 20px 30px;
+  font-weight: bold;
 }
 
 .hud-item {
