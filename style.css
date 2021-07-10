@@ -1,7 +1,9 @@
 
 /* Actual code below */
 :root {
-  --river: rgb(148,212,252);
+  --river: rgb(148,212,252); /* #94D4FC */
+  --number: rgb(50, 212, 0);
+  --symbol: rgb(235, 157, 12);
 }
 
 * {
@@ -21,9 +23,8 @@ header {
 }
 
 header > h1 {
-  color: rgb(148,212,252);
+  color: var(--river);
   text-align: center;
-  
 }
 
 .hud {
@@ -40,19 +41,45 @@ header > h1 {
   margin: 20px auto;
   border: 3px solid white;
   width: 500px;
-  height: 60px;
+  height: 65px;
   text-align: center;
-  color: white;
+  color: rgb(35 112 160);
   font-size: 38px;
   border-radius: 5px;
-  padding: 5px 20px;
+  padding: 5px 10px;
 }
 
-.userinput {
+.equation-slot {
+  display: inline-block;
+  width: 30px;
+  border-radius: 10px;
+  padding: 3px;
+  color: white;
+}
+
+.equation-slot:nth-child(2) {
+  background-color: var(--symbol);
+}
+
+.equation-slot:nth-of-type(odd) {
+  background-color: var(--number);
+  width: 90px;
+}
+
+.user-input {
   line-height: 40px;
-  max-width: 100px;
-  padding: 0px;
+  width: 100px;
+  height: 50px;
+  padding: 3px;
   font-size: 38px;
+  color: var(--river);
+  border-radius: 5px;
+  border: none;
+  text-align: center;
+}
+
+.user-input::placeholder {
+  color: var(--river);
 }
 
 
