@@ -13,17 +13,20 @@
   <main> 
     <div class="hud">
       <!-- Keeps track of user's score and time -->
-      <div class="hud-item">Rubbish Cleared: <span id="score">X</span></div>
+      <div>
+        <div class="hud-item">Score: <span id="score"></span></div>
+        <div class="hud-item">Rubbish Cleared: <span id="rubbish-cleared"></span></div>
+      </div>
       <div class="hud-item">Time Left: <span id="time">X</span> seconds</div>
     </div>
 
     <div class="equation">
       <!-- Javascript to populate stuffs here -->
-      <span class="equation-slot" id="slot-1">300</span>
-      <span class="equation-slot" id="slot-2">+</span>
-      <span class="equation-slot" id="slot-3">400</span>
+      <span class="equation-slot" id="slot-1"></span>
+      <span class="equation-slot" id="slot-2"></span>
+      <span class="equation-slot" id="slot-3"></span>
       <span>=</span>
-      <!-- User press [Enter] -->
+      <!-- Last Child is for user input -->
       <input type="text" class="user-input" maxlength="4" placeholder="0">
     </div>
 
