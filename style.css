@@ -23,20 +23,21 @@ header {
   padding: 20px;
 }
 
-header > h1 {
-  color: var(--river);
-  text-align: center;
-}
-
 .hud {
   display: flex;
   justify-content: space-between;
   margin: 20px 30px;
   font-weight: bold;
+  align-items: center;
+}
+
+.hud > h1 {
+  color: var(--river);
+  text-align: center;
 }
 
 .hud-item {
-  
+  color: var(--river);
 }
 
 .equation {
