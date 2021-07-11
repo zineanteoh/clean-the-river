@@ -4,7 +4,7 @@ let numberCount = 0; // keeps track of how many 'numbers' are in river
 let symbolCount = 0; // keeps track of how many 'symbols' are in river
 let pixelCounts = []; // animates the movement of rubbish
 
-const startRubbish = 30; // number of rubbish start of game
+const startRubbish = 24; // number of rubbish start of game
 const river = document.querySelector(".river");
 const equation = document.querySelector(".equation");
 let score = 0;
@@ -98,7 +98,7 @@ function addRubbish() {
     }
   }
   // Set rubbish to a random position
-  newRubbish.style.top = Math.floor(Math.random() * 85) + "%";
+  newRubbish.style.top = Math.floor(Math.random() * 80) + "%";
   newRubbish.style.left = Math.floor(Math.random() * 98) + "%";
   river.appendChild(newRubbish);
 }

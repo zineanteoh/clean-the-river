@@ -54,7 +54,7 @@ header {
 
 .equation-slot {
   display: inline-block;
-  width: 30px;
+  width: 60px;
   border-radius: 10px;
   padding: 3px;
   color: white;
@@ -93,14 +93,16 @@ header {
 }
 
 .rubbish {
-  width: 30px;
+  width: 60px;
+  height: 60px;
   border-radius: 10px;
-  padding: 3px;
+  padding-top: 0.6%;
   color: white;
   cursor: pointer;
   text-align: center;
   /* display: block; */
   position: absolute;
+  font-size: 32px;
 }
 
 .number {
