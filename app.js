@@ -71,6 +71,8 @@ function step(timestamp) {
     // console.log(maxX, maxY);
 
     child.style.left = limitMax(parseFloat(child.style.left) + (1 / duration / 10), 0, 100) + "%";
+    child.style.top = parseFloat(child.style.top) + 0.1 * Math.sin(parseFloat(child.style.left)) + "%";
+    
     if (progress >= 1) start = null;
   }
   requestAnimationFrame(step);
