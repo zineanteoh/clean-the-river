@@ -124,6 +124,7 @@ function getNewNumber() {
   newNumber.addEventListener("click", function() {
     // Listens to click event. When clicked, add number to the equation if there is an empty slot 
     if (newNumber.style.opacity == "1" || newNumber.style.opacity == "") {
+      // Finds if empty slot available in the equation, if so add rubbish 
       if (equation.children[0].textContent == "") {
         equation.children[0].textContent = newNumber.textContent;
         newNumber.style.opacity = "0.5";
@@ -134,6 +135,20 @@ function getNewNumber() {
         rubbishInEquation.push(newNumber);
       } else {
         console.log("Equation already has 2 numbers!");
+      }
+    } else {
+      // Removes rubbish from the equation 
+      newNumber.style.opacity = "1";
+      for(let i = 0; i < equationSlots.length; i++) {
+        if (equationSlots[i].textContent == newNumber.textContent) {
+          for(let j = 0; j < rubbishInEquation.length; j++) {
+            if (rubbishInEquation[j].textContent == equationSlots[i].textContent) {
+              rubbishInEquation[j].style.opacity = "1";
+              rubbishInEquation.splice(j, 1);
+            }
+          }
+          equationSlots[i].textContent = "";
+        }
       }
     }
   });
@@ -163,6 +178,20 @@ function getNewSymbol() {
       } else {
         console.log("Equation already has a mathematical symbol!");
       };
+    } else {
+      // Removes rubbish from the equation
+      newSymbol.style.opacity = "1";
+      for(let i = 0; i < equationSlots.length; i++) {
+        if (equationSlots[i].textContent == newSymbol.textContent) {
+          for(let j = 0; j < rubbishInEquation.length; j++) {
+            if (rubbishInEquation[j].textContent == equationSlots[i].textContent) {
+              rubbishInEquation[j].style.opacity = "1";
+              rubbishInEquation.splice(j, 1);
+            }
+          }
+          equationSlots[i].textContent = "";
+        }
+      }
     }
   });
   return newSymbol;
