@@ -2,7 +2,6 @@
 let rubbishInEquation = []; // keeps track of the greyed out rubbish that are in equation
 let numberCount = 0; // keeps track of how many 'numbers' are in river
 let symbolCount = 0; // keeps track of how many 'symbols' are in river
-let pixelCounts = []; // animates the movement of rubbish
 
 const startRubbish = 24; // number of rubbish start of game
 const river = document.querySelector(".river");
@@ -13,6 +12,9 @@ let time = 0;
 document.querySelector("#score").textContent = score; 
 document.querySelector("#rubbish-cleared").textContent = clearedRubbish;
 document.querySelector("#time").textContent = time;
+
+// Variables for animating rubbish
+let duration = 2; // longer duration = slower rubbish flow
 
 // Start the game by populating rubbish on screen 
 initiateRubbish();
@@ -48,29 +50,37 @@ equation.lastElementChild.addEventListener("keyup", function(event) {
 });
 
 // Animate Objects on screen
-// Code template taken from YouTube video "Animation Loops in JavaScript using requestAnimationFrame by KIPURA"
+// Code template taken from the-art-of-web.com/javascript/animate-curved-path/
 let requestAnimationFrame = window.requestAnimationFrame || 
                             window.mozRequestAnimationFrame || 
                             window.webkitRequestAnimationFrame || 
                             window.msRequestAnimationFrame;
-let pixelCount = 0;
-function animationLoop() {
+let start = null;
+function step(timestamp) {
   // Animate rubbish
   let children = river.children;
   for(let i = 0; i < children.length; i++) {
-    // Get pixelCount
+    let progress, x, y;
+    if (start === null) start = timestamp;
+    
+    progress = (timestamp - start) / duration / 1000; // percent
+    
     let child = children[i];
-    pixelCount += 0.01;
-    let childLeft = parseFloat(child.style.left) / 100 * window.innerWidth; 
-    if (childLeft + pixelCount > window.innerWidth) {
+    let maxX = river.clientWidth - child.offsetWidth;
+    let maxY = river.clientHeight - child.offsetHeight;
+    // console.log(maxX, maxY);
 
-    }
-    // child.style.transform = `translate(${pixelCount}px)`;
+    child.style.left = limitMax(parseFloat(child.style.left) + (1 / duration / 10), 0, 100) + "%";
+    if (progress >= 1) start = null;
   }
-  requestAnimationFrame(animationLoop);
+  requestAnimationFrame(step);
 }
-requestAnimationFrame(animationLoop);
+requestAnimationFrame(step);
 
+// Sets a value to min once it exceeds max
+function limitMax(val, min, max) {
+  return val > max ? min : val;
+}
 
 // Populates the river with rubbish the moment the game starts
 function initiateRubbish() {
@@ -98,8 +108,8 @@ function addRubbish() {
     }
   }
   // Set rubbish to a random position
-  newRubbish.style.top = Math.floor(Math.random() * 80) + "%";
-  newRubbish.style.left = Math.floor(Math.random() * 98) + "%";
+  newRubbish.style.top = Math.floor(Math.random() * 85) + "%"; // Math.floor(Math.random() * (river.clientHeight - newRubbish.offsetHeight)) + "px"; river.clientHeight - 70 + 
+  newRubbish.style.left = Math.floor(Math.random() * 100) + "%";
   river.appendChild(newRubbish);
 }
 
