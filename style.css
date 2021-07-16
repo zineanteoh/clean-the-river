@@ -1,7 +1,8 @@
 
 /* Actual code below */
 :root {
-  --river: rgb(148,212,252); /* #94D4FC */
+  --river: rgb(11, 136, 219);
+  --lightblue: rgb(148,212,252); /* #94D4FC */
   --number: rgb(50, 212, 0);
   --symbol: rgb(235, 157, 12);
 }
@@ -15,31 +16,137 @@
 } 
 
 body {
-  background-color: var(--river);
+  background-color: var(--lightblue);
+  overflow: hidden;
+  /* Disable double click to highlight text */
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 header {
   background: white;
   padding: 20px;
-}
+  height: 220px;
+  /* background-color: aqua; */
+} 
 
-.hud {
-  display: flex;
-  justify-content: space-between;
-  margin: 20px 30px;
-  font-weight: bold;
-  align-items: center;
-}
-
-.hud > h1 {
-  color: var(--river);
+.header-content {
   text-align: center;
+  width: 100%;
+  margin: 140px auto;
+  font-weight: bold;
+}
+
+#title {
+  color: var(--lightblue);
+  text-align: center;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 50px auto;
+  width: 100%;
+  font-size: 4rem; 
+  /* margin: 20px auto; */
+  /* font-size: 2rem; */
+  /* background-color: pink; */
 }
 
 .hud-item {
-  color: var(--river);
+  color: var(--lightblue);
 }
 
+/*  ----------------- Gamemode Selection ----------------- */
+.menu {
+  margin-top: 2%;
+  text-align: center;
+}
+
+.menu-title {
+  color: white;
+  font-weight: bold;
+  font-size: 34px;
+}
+
+.gamemode {
+  margin: 20px auto;
+}
+
+.gamemode tr {
+  height: 70px;
+}
+
+.mode-label {
+  text-align: right;
+  color: white;
+}
+
+.mode-option {
+  width: 200px;
+}
+
+.select-symbol {
+  display: inline-block;
+  width: 40px;
+  margin-left: 10%;
+  padding: 15px;
+  background-color: rgb(177, 252, 136);
+}
+
+.select-symbol:hover {
+  animation-name: zoom-out;
+  animation-duration: 0.4s;
+  animation-fill-mode: forwards;
+}
+
+.unselected {
+  background-color: rgba(177, 252, 136, 0.336);
+  color: rgba(0, 0, 0, 0.336);
+}
+
+@keyframes zoom-out {
+  100% {
+    transform: scale(1.1);
+  }
+}
+
+#difficulty, #health {
+  height: 25px;
+  width: 80%;
+  margin: 0 15%;
+}
+
+.start-game {
+  font-size: 1.4rem;
+  background-color: var(--river);
+  width: 150px;
+  padding: 10px;
+  margin: auto;
+  cursor: pointer;
+  color: white;
+}
+
+.start-game:hover {
+  background-color: var(--river);
+  opacity: 0.7;
+  animation-name: start;
+  animation-duration: 0.3s;
+  animation-fill-mode: forwards;
+  /* width: 200px; */
+}
+
+@keyframes start {
+  100% {
+    transform: scale(1.1);
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+/*  ----------------- Equation ----------------- */
 .equation {
   margin: 20px auto;
   border: 3px solid white;
@@ -76,18 +183,19 @@ header {
   height: 50px;
   padding: 3px;
   font-size: 38px;
-  color: var(--river);
+  color: var(--lightblue);
   border-radius: 5px;
   border: none;
   text-align: center;
 }
 
 .user-input::placeholder {
-  color: var(--river);
+  color: var(--lightblue);
 }
 
+/* ----------------- River ----------------- */
 .river {
-  background-color:rgb(11, 136, 219);
+  background-color: var(--river);
   height: 50vh;
   position: relative;
 }

@@ -3,21 +3,81 @@ let rubbishInEquation = []; // keeps track of the greyed out rubbish that are in
 let numberCount = 0; // keeps track of how many 'numbers' are in river
 let symbolCount = 0; // keeps track of how many 'symbols' are in river
 
-const startRubbish = 24; // number of rubbish start of game
 const river = document.querySelector(".river");
 const equation = document.querySelector(".equation");
-let score = 0;
+let lives = 0;
 let clearedRubbish = 0; 
-let time = 0;
-document.querySelector("#score").textContent = score; 
+// let time = 0;
+const hudItem = document.querySelectorAll(".hud-item");
 document.querySelector("#rubbish-cleared").textContent = clearedRubbish;
-document.querySelector("#time").textContent = time;
 
-// Variables for animating rubbish
+
+prepareGame();
+function prepareGame() {
+  // Add event listeners to symbols
+  const symbols = document.querySelectorAll(".select-symbol");
+  for(let i = 0; i < symbols.length; i++) {
+    symbols[i].addEventListener("click", function() {
+      symbols[i].classList.toggle("unselected");
+    });
+  }
+
+  // Add event listeners to start game
+  const startGameButton = document.querySelector(".start-game");
+  startGameButton.addEventListener("click", function() {
+    let plus = symbols[0].classList.contains("unselected") ? "" : "+";
+    let minus = symbols[1].classList.contains("unselected") ? "" : "-";
+    let multiply = symbols[2].classList.contains("unselected") ? "" : "x";
+    let symbolList = plus + minus + multiply;
+    let difficulty = document.getElementById("difficulty").value;
+    let health = document.getElementById("health").value;
+    if(symbolList != "") {
+      document.querySelector(".menu").classList.add("hidden");
+      document.querySelector(".gameplay").classList.remove("hidden");
+      for(let i = 0; i < hudItem.length; i++) {
+        hudItem[i].classList.remove("hidden");
+      }
+      // Start Game
+      startGame(symbolList, difficulty, health);
+    } else {
+      console.log("You have to select at least ONE symbol!");
+    }
+
+  });
+}
+
+// Animate Objects on screen
+// ...code template taken from the-art-of-web.com/javascript/animate-curved-path/
+let requestAnimationFrame = window.requestAnimationFrame || 
+                            window.mozRequestAnimationFrame || 
+                            window.webkitRequestAnimationFrame || 
+                            window.msRequestAnimationFrame; 
+// Variables for animating rubbish 
+let start = null; 
 let duration = 2; // longer duration = slower rubbish flow
+function step(timestamp) {
+  // Animate rubbish
+  let children = river.children;
+  for(let i = 0; i < children.length; i++) {
+    let progress, x, y;
+    if (start === null) start = timestamp;
+    
+    progress = (timestamp - start) / duration / 1000; // percent
+    
+    let child = children[i];
+    child.style.left = limitMax(parseFloat(child.style.left) + (1 / duration / 10), 0, 100) + "%";
+    child.style.top = parseFloat(child.style.top) + 0.1 * Math.sin(parseFloat(child.style.left)) + "%";
+    
+    if (progress >= 1) start = null;
+  }
+  requestAnimationFrame(step);
 
-// Start the game by populating rubbish on screen 
-initiateRubbish();
+  // Sets a value to min once it exceeds max
+  function limitMax(val, min, max) {
+    return val > max ? min : val; 
+  }
+}
+requestAnimationFrame(step);
 
 // Adds event listener to equation slots, which allows user to de-select rubbish 
 const equationSlots = document.querySelectorAll(".equation-slot");
@@ -49,60 +109,51 @@ equation.lastElementChild.addEventListener("keyup", function(event) {
   };
 });
 
-// Animate Objects on screen
-// Code template taken from the-art-of-web.com/javascript/animate-curved-path/
-let requestAnimationFrame = window.requestAnimationFrame || 
-                            window.mozRequestAnimationFrame || 
-                            window.webkitRequestAnimationFrame || 
-                            window.msRequestAnimationFrame;
-let start = null;
-function step(timestamp) {
-  // Animate rubbish
-  let children = river.children;
-  for(let i = 0; i < children.length; i++) {
-    let progress, x, y;
-    if (start === null) start = timestamp;
-    
-    progress = (timestamp - start) / duration / 1000; // percent
-    
-    let child = children[i];
-    let maxX = river.clientWidth - child.offsetWidth;
-    let maxY = river.clientHeight - child.offsetHeight;
-    // console.log(maxX, maxY);
+// Start the game based on the selected gamemode
+let startRubbish; // number of rubbish start of game
+function startGame(symbolList, difficulty, health) {
+  console.log(symbolList, difficulty, health);
 
-    child.style.left = limitMax(parseFloat(child.style.left) + (1 / duration / 10), 0, 100) + "%";
-    child.style.top = parseFloat(child.style.top) + 0.1 * Math.sin(parseFloat(child.style.left)) + "%";
-    
-    if (progress >= 1) start = null;
+  switch(difficulty) {
+    case 'easy':
+      startRubbish = 15;
+      break;
+    case 'normal':
+      startRubbish = 24;
+      break;
+    case 'hard':
+      startRubbish = 30;
+      break;
+    case 'insane':
+      startRubbish = 45;
+      break;
   }
-  requestAnimationFrame(step);
-}
-requestAnimationFrame(step);
 
-// Sets a value to min once it exceeds max
-function limitMax(val, min, max) {
-  return val > max ? min : val;
-}
+  if(health != "inf") {
+    lives = parseFloat(health); 
+    document.querySelector("#lives").textContent = parseFloat(health); 
+  } else {
+    lives = "∞";
+    document.querySelector("#lives").textContent = "∞";
+  }
 
-// Populates the river with rubbish the moment the game starts
-function initiateRubbish() {
   for(let i = 0; i < startRubbish; i++) {
-    addRubbish();
+    addRubbish(symbolList);
   }
 }
 
 // Add a random rubbish (number or symbol) to river while maintaining a 2:1 ratio for number:symbol
-function addRubbish() {
+function addRubbish(symbolList) {
   let newRubbish;
   if (numberCount / 2 > symbolCount) {
-    newRubbish = getNewSymbol();
+    newRubbish = getNewSymbol(symbolList);
     symbolCount++;
   } else if (numberCount / 2 < symbolCount) {
     newRubbish = getNewNumber();
     numberCount++;
   } else {
     if (Math.floor(Math.random() * 2) == 0) {
-      newRubbish = getNewSymbol();
+      newRubbish = getNewSymbol(symbolList);
       symbolCount++;
     } else {
       newRubbish = getNewNumber();
@@ -110,15 +161,15 @@ function addRubbish() {
     }
   }
   // Set rubbish to a random position
-  newRubbish.style.top = Math.floor(Math.random() * 85) + "%"; // Math.floor(Math.random() * (river.clientHeight - newRubbish.offsetHeight)) + "px"; river.clientHeight - 70 + 
-  newRubbish.style.left = Math.floor(Math.random() * 100) + "%";
+  newRubbish.style.top = Math.floor(Math.random() * 85) + "%"; 
+  newRubbish.style.left = (10 - Math.floor(Math.random() * 100)) + "%"; 
   river.appendChild(newRubbish);
 }
 
 // Returns a HTML element with a random number 
 function getNewNumber() {
   let newNumber = document.createElement("p");
-  newNumber.textContent = Math.floor(Math.random() * 100); // Number goes from 0 to 99
+  newNumber.textContent = Math.floor(Math.random() * 99) + 1; // Number Range
   newNumber.classList.add("rubbish");
   newNumber.classList.add("number");
   newNumber.addEventListener("click", function() {
@@ -156,16 +207,10 @@ function getNewNumber() {
 }
 
 // Returns a HTML element with a random symbol (+, -, x)
-function getNewSymbol() {
+function getNewSymbol(symbolList) {
   let newSymbol = document.createElement("p");
-  let n = Math.floor(Math.random() * 3);
-  if (n == 0) {
-    newSymbol.textContent = "+";  
-  } else if (n == 1) {
-    newSymbol.textContent = "-";
-  } else {
-    newSymbol.textContent = "x";
-  }
+  let n = Math.floor(Math.random() * symbolList.length);
+  newSymbol.textContent = symbolList[n];
   newSymbol.classList.add("rubbish");
   newSymbol.classList.add("symbol");
   newSymbol.addEventListener("click", function() {
@@ -206,11 +251,10 @@ function validateEquation() {
     left += eq[i].textContent;
   }
   if (eval(left.replace("x", "*")) == eval(right)) {
-    score += Math.abs(eval(left.replace("x", "*")));
     clearedRubbish += 3;
     symbolCount--;
     numberCount -= 2;
-    document.querySelector("#score").textContent = score;
+    document.querySelector("#lives").textContent = lives;
     document.querySelector("#rubbish-cleared").textContent = clearedRubbish;
     console.log("Correct! " + left + " = " + eval(right));
     cleanRubbish();
