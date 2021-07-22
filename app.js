@@ -7,7 +7,6 @@ const river = document.querySelector(".river");
 const equation = document.querySelector(".equation");
 let lives = 0;
 let clearedRubbish = 0; 
-// let time = 0;
 const hudItem = document.querySelectorAll(".hud-item");
 document.querySelector("#rubbish-cleared").textContent = clearedRubbish;
 
