@@ -4,3 +4,4 @@
 
 **Intended Audience:** 3 to 12 years old
 
+![Demo of gameplay](https://i.imgur.com/tyTAkeL.gif)
