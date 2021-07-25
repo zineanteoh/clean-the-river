@@ -8,13 +8,12 @@ const equation = document.querySelector(".equation");
 let lives = 0;
 let clearedRubbish = 0; 
 const hudItem = document.querySelectorAll(".hud-item");
-document.querySelector("#rubbish-cleared").textContent = clearedRubbish;
 
 // Start the game based on the selected gamemode
-let rubbishInflow; // rate of rubbish inflow per 5 second
+let lapse; // time lapse between every new rubbish, in ms
 let rubbishLimit; // limit of rubbish in a river
-let rubbishFlowRate = 4; // rubbish flow rate. 4 is slow, 10 is fast
-let setRubbishInterval; // adds rubbish at the rate of rubbishInflow per second using setInterval()
+let rubbishFlowRate = 4; // rubbish flow rate. 4 is ideal
+let interval; // adds rubbish at the rate of rubbishInflow per second using setInterval()
 
 prepareGame();
 function prepareGame() {
@@ -38,6 +37,8 @@ function prepareGame() {
     if(symbolList != "") {
       document.querySelector(".menu").classList.add("hidden");
       document.querySelector(".gameplay").classList.remove("hidden");
+      document.querySelector("#title").remove();
+      createEquationLog();
       for(let i = 0; i < hudItem.length; i++) {
         hudItem[i].classList.remove("hidden");
       }
@@ -85,19 +86,19 @@ function startGame(symbolList, difficulty, health) {
 
   switch(difficulty) {
     case 'easy':
-      rubbishInflow = 1;
+      lapse = 5000;
       rubbishLimit = 18;
       break;
     case 'normal':
-      rubbishInflow = 2;
+      lapse = 3000;
       rubbishLimit = 24;
       break;
     case 'hard':
-      rubbishInflow = 3;
+      lapse = 2000;
       rubbishLimit = 30;
       break;
     case 'insane':
-      rubbishInflow = 5;
+      lapse = 1000; 
       rubbishLimit = 54;
       break;
   }
@@ -110,20 +111,22 @@ function startGame(symbolList, difficulty, health) {
     document.querySelector("#lives").textContent = "∞";
   }
 
-  // populate rubbish until it reaches rubbish limit
+  document.querySelector("#rubbish-cleared").textContent = clearedRubbish;
+
+  // add rubbish
   let i = 0;
   let initiateRubbish = setInterval(function() {
-    addRubbish(symbolList, true);
+    addRubbish(symbolList);
     i++;
-    if (i >= rubbishLimit) clearInterval(initiateRubbish);
-  }, 1500);
-
-  // add rubbish every 5 seconds
-  setRubbishInterval = setInterval(function() {
-    if (numberCount + symbolCount <= rubbishLimit) {
-      addRubbish(symbolList, false);
+    if (i >= rubbishLimit) {
+      clearInterval(initiateRubbish);
+      interval = setInterval(function() {
+        if (numberCount + symbolCount <= rubbishLimit) {
+          addRubbish(symbolList);
+        }
+      }, lapse);
     }
-  }, 5000);
+  }, 1000);
 }
 
 // Animate rubbish
@@ -157,8 +160,32 @@ function step(timestamp) {
 }
 requestAnimationFrame(step);
 
+// Create and add a new div element to represent the equation log 
+function createEquationLog() {
+  let eqLog = document.createElement("div");
+  eqLog.classList.add("equationLog");
+  document.querySelector(".header-content").appendChild(eqLog);
+}
+
+// Create and insert user-entered equation to the equation log
+function addEquationLog(text, isCorrect) {
+  let eqLog = document.querySelector(".equationLog");
+  let newEq = document.createElement("p");
+  newEq.classList.add("logText");
+  if (isCorrect) {
+    newEq.classList.add("correct");
+  } else {
+    newEq.classList.add("wrong");
+  }
+  newEq.innerHTML = text;
+  eqLog.appendChild(newEq);
+
+  // auto scrolls to bottom every time new text is added
+  eqLog.scrollTop = eqLog.scrollHeight;
+}
+
 // Add rubbish (number or symbol) to river while maintaining a 2:1 ratio for number:symbol
-function addRubbish(symbolList, isQuick) { 
+function addRubbish(symbolList) { 
   let newRubbish;
   if (numberCount / 2 > symbolCount) {
     newRubbish = getNewSymbol(symbolList);
@@ -177,11 +204,7 @@ function addRubbish(symbolList, isQuick) {
   }
   // Set rubbish to a random position
   newRubbish.style.top = Math.floor(Math.random() * 85) + "%"; 
-  if (isQuick) {
-    newRubbish.style.left = "0%"; 
-  } else {
-    newRubbish.style.left = - (Math.floor(Math.random() * 30)) + "%"; 
-  }
+  newRubbish.style.left = "0%"; 
   river.appendChild(newRubbish);
 }
 
@@ -267,7 +290,7 @@ function validateEquation() {
   let left = "";
   let right = equation.lastElementChild.value;
   for(let i = 0; i <= 2; i++) {
-    left += eq[i].textContent;
+    left += eq[i].textContent + " ";
   }
   if (eval(left.replace("x", "*")) == eval(right)) {
     clearedRubbish += 3;
@@ -277,9 +300,11 @@ function validateEquation() {
     document.querySelector("#lives").textContent = lives;
     document.querySelector("#rubbish-cleared").textContent = clearedRubbish;
     console.log("Correct! " + left + " = " + eval(right));
+    addEquationLog(left + "= " + eval(right), true);
     cleanRubbish();
   } else {
     console.log("Oops Wrong Answer! " + left + " is not " + eval(right));
+    addEquationLog(left + "= " + "<span class='wrong-wavy'>" + eval(right) + "*</span>", false);
     clearEquation();
   }
 }
