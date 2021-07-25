@@ -1,5 +1,5 @@
 
-let rubbishInEquation = []; // keeps track of the greyed out rubbish that are in equation
+let selectedRubbish = []; // keeps track of the selected rubbish that are in equation
 let numberCount = 0; // keeps track of how many 'numbers' are in river
 let symbolCount = 0; // keeps track of how many 'symbols' are in river
 
@@ -10,6 +10,11 @@ let clearedRubbish = 0;
 const hudItem = document.querySelectorAll(".hud-item");
 document.querySelector("#rubbish-cleared").textContent = clearedRubbish;
 
+// Start the game based on the selected gamemode
+let rubbishInflow; // rate of rubbish inflow per 5 second
+let rubbishLimit; // limit of rubbish in a river
+let rubbishFlowRate = 4; // rubbish flow rate. 4 is slow, 10 is fast
+let setRubbishInterval; // adds rubbish at the rate of rubbishInflow per second using setInterval()
 
 prepareGame();
 function prepareGame() {
@@ -45,15 +50,89 @@ function prepareGame() {
   });
 }
 
-// Animate Objects on screen
+// Adds event listener to equation slots, which allows user to de-select rubbish 
+const equationSlots = document.querySelectorAll(".equation-slot");
+for(let i = 0; i < equationSlots.length; i++) {
+  equationSlots[i].addEventListener("click", function() {
+    if (equationSlots[i].textContent != "") {
+      for(let j = 0; j < selectedRubbish.length; j++) {
+        if (selectedRubbish[j].textContent == equationSlots[i].textContent) {
+          // set greyed-out opacity back to 1
+          selectedRubbish[j].style.opacity = "1";
+          // remove the clicked rubbish from rubbishInEquation
+          selectedRubbish.splice(j, 1);
+          break;
+        }
+      }
+      equationSlots[i].textContent = "";
+    }
+  });
+}
+
+// Checks user answer when user presses [Enter] key
+equation.lastElementChild.addEventListener("keyup", function(event) {
+  if(event.keyCode === 13) {
+    if (selectedRubbish.length == 3) {
+      validateEquation();
+    } else {
+      console.log("This is not a valid expression!"); 
+    }
+  };
+});
+
+function startGame(symbolList, difficulty, health) {
+  console.log(symbolList, difficulty, health);
+
+  switch(difficulty) {
+    case 'easy':
+      rubbishInflow = 1;
+      rubbishLimit = 18;
+      break;
+    case 'normal':
+      rubbishInflow = 2;
+      rubbishLimit = 24;
+      break;
+    case 'hard':
+      rubbishInflow = 3;
+      rubbishLimit = 30;
+      break;
+    case 'insane':
+      rubbishInflow = 5;
+      rubbishLimit = 54;
+      break;
+  }
+
+  if(health != "inf") {
+    lives = parseFloat(health); 
+    document.querySelector("#lives").textContent = parseFloat(health); 
+  } else {
+    lives = "∞";
+    document.querySelector("#lives").textContent = "∞";
+  }
+
+  // populate rubbish until it reaches rubbish limit
+  let i = 0;
+  let initiateRubbish = setInterval(function() {
+    addRubbish(symbolList, true);
+    i++;
+    if (i >= rubbishLimit) clearInterval(initiateRubbish);
+  }, 1500);
+
+  // add rubbish every 5 seconds
+  setRubbishInterval = setInterval(function() {
+    if (numberCount + symbolCount <= rubbishLimit) {
+      addRubbish(symbolList, false);
+    }
+  }, 5000);
+}
+
+// Animate rubbish
 // ...code template taken from the-art-of-web.com/javascript/animate-curved-path/
 let requestAnimationFrame = window.requestAnimationFrame || 
                             window.mozRequestAnimationFrame || 
                             window.webkitRequestAnimationFrame || 
                             window.msRequestAnimationFrame; 
-// Variables for animating rubbish 
 let start = null; 
-let duration = 2; // longer duration = slower rubbish flow
 function step(timestamp) {
   // Animate rubbish
   let children = river.children;
@@ -61,10 +140,10 @@ function step(timestamp) {
     let progress, x, y;
     if (start === null) start = timestamp;
     
-    progress = (timestamp - start) / duration / 1000; // percent
+    progress = (timestamp - start) * rubbishFlowRate / 1000; // percent
     
-    let child = children[i];
-    child.style.left = limitMax(parseFloat(child.style.left) + (1 / duration / 10), 0, 100) + "%";
+    let child = children[i]; 
+    child.style.left = limitMax(parseFloat(child.style.left) + (1 * rubbishFlowRate / 100), 0, 100) + "%";
     child.style.top = parseFloat(child.style.top) + 0.1 * Math.sin(parseFloat(child.style.left)) + "%";
     
     if (progress >= 1) start = null;
@@ -78,71 +157,8 @@ function step(timestamp) {
 }
 requestAnimationFrame(step);
 
-// Adds event listener to equation slots, which allows user to de-select rubbish 
-const equationSlots = document.querySelectorAll(".equation-slot");
-for(let i = 0; i < equationSlots.length; i++) {
-  equationSlots[i].addEventListener("click", function() {
-    if (equationSlots[i].textContent != "") {
-      for(let j = 0; j < rubbishInEquation.length; j++) {
-        if (rubbishInEquation[j].textContent == equationSlots[i].textContent) {
-          // set greyed-out opacity back to 1
-          rubbishInEquation[j].style.opacity = "1";
-          // remove the clicked rubbish from rubbishInEquation
-          rubbishInEquation.splice(j, 1);
-          break;
-        }
-      }
-      equationSlots[i].textContent = "";
-    }
-  });
-}
-
-// Checks user answer when user presses [Enter] key
-equation.lastElementChild.addEventListener("keyup", function(event) {
-  if(event.keyCode === 13) {
-    if (rubbishInEquation.length == 3) {
-      validateEquation();
-    } else {
-      console.log("This is not a valid expression!"); 
-    }
-  };
-});
-
-// Start the game based on the selected gamemode
-let startRubbish; // number of rubbish start of game
-function startGame(symbolList, difficulty, health) {
-  console.log(symbolList, difficulty, health);
-
-  switch(difficulty) {
-    case 'easy':
-      startRubbish = 15;
-      break;
-    case 'normal':
-      startRubbish = 24;
-      break;
-    case 'hard':
-      startRubbish = 30;
-      break;
-    case 'insane':
-      startRubbish = 45;
-      break;
-  }
-
-  if(health != "inf") {
-    lives = parseFloat(health); 
-    document.querySelector("#lives").textContent = parseFloat(health); 
-  } else {
-    lives = "∞";
-    document.querySelector("#lives").textContent = "∞";
-  }
-
-  for(let i = 0; i < startRubbish; i++) {
-    addRubbish(symbolList);
-  }
-}
-
-// Add a random rubbish (number or symbol) to river while maintaining a 2:1 ratio for number:symbol
-function addRubbish(symbolList) {
+// Add rubbish (number or symbol) to river while maintaining a 2:1 ratio for number:symbol
+function addRubbish(symbolList, isQuick) { 
   let newRubbish;
   if (numberCount / 2 > symbolCount) {
     newRubbish = getNewSymbol(symbolList);
@@ -161,7 +177,11 @@ function addRubbish(symbolList) {
   }
   // Set rubbish to a random position
   newRubbish.style.top = Math.floor(Math.random() * 85) + "%"; 
-  newRubbish.style.left = (10 - Math.floor(Math.random() * 100)) + "%"; 
+  if (isQuick) {
+    newRubbish.style.left = "0%"; 
+  } else {
+    newRubbish.style.left = - (Math.floor(Math.random() * 30)) + "%"; 
+  }
   river.appendChild(newRubbish);
 }
 
@@ -178,11 +198,11 @@ function getNewNumber() {
       if (equation.children[0].textContent == "") {
         equation.children[0].textContent = newNumber.textContent;
         newNumber.style.opacity = "0.5";
-        rubbishInEquation.push(newNumber);
+        selectedRubbish.push(newNumber);
       } else if (equation.children[2].textContent == "") {
         equation.children[2].textContent = newNumber.textContent;
         newNumber.style.opacity = "0.5";
-        rubbishInEquation.push(newNumber);
+        selectedRubbish.push(newNumber);
       } else {
         console.log("Equation already has 2 numbers!");
       }
@@ -191,10 +211,10 @@ function getNewNumber() {
       newNumber.style.opacity = "1";
       for(let i = 0; i < equationSlots.length; i++) {
         if (equationSlots[i].textContent == newNumber.textContent) {
-          for(let j = 0; j < rubbishInEquation.length; j++) {
-            if (rubbishInEquation[j].textContent == equationSlots[i].textContent) {
-              rubbishInEquation[j].style.opacity = "1";
-              rubbishInEquation.splice(j, 1);
+          for(let j = 0; j < selectedRubbish.length; j++) {
+            if (selectedRubbish[j].textContent == equationSlots[i].textContent) {
+              selectedRubbish[j].style.opacity = "1";
+              selectedRubbish.splice(j, 1);
             }
           }
           equationSlots[i].textContent = "";
@@ -218,7 +238,7 @@ function getNewSymbol(symbolList) {
       if (equation.children[1].textContent == "") {
         equation.children[1].textContent = newSymbol.textContent;
         newSymbol.style.opacity = "0.5";
-        rubbishInEquation.push(newSymbol);
+        selectedRubbish.push(newSymbol);
       } else {
         console.log("Equation already has a mathematical symbol!");
       };
@@ -227,10 +247,10 @@ function getNewSymbol(symbolList) {
       newSymbol.style.opacity = "1";
       for(let i = 0; i < equationSlots.length; i++) {
         if (equationSlots[i].textContent == newSymbol.textContent) {
-          for(let j = 0; j < rubbishInEquation.length; j++) {
-            if (rubbishInEquation[j].textContent == equationSlots[i].textContent) {
-              rubbishInEquation[j].style.opacity = "1";
-              rubbishInEquation.splice(j, 1);
+          for(let j = 0; j < selectedRubbish.length; j++) {
+            if (selectedRubbish[j].textContent == equationSlots[i].textContent) {
+              selectedRubbish[j].style.opacity = "1";
+              selectedRubbish.splice(j, 1);
             }
           }
           equationSlots[i].textContent = "";
@@ -253,6 +273,7 @@ function validateEquation() {
     clearedRubbish += 3;
     symbolCount--;
     numberCount -= 2;
+    // Update Lives & Rubbish Cleared 
     document.querySelector("#lives").textContent = lives;
     document.querySelector("#rubbish-cleared").textContent = clearedRubbish;
     console.log("Correct! " + left + " = " + eval(right));
@@ -265,20 +286,20 @@ function validateEquation() {
 
 // Removes rubbish from the river and calls clearEquation() 
 function cleanRubbish() {
-  rubbishInEquation.forEach(function (item) {
+  selectedRubbish.forEach(function (item) {
     item.remove();
   });
-  rubbishInEquation = [];
+  selectedRubbish = [];
   clearEquation();
   equation.lastElementChild.value = "";
 }
 
 // Clears equation by reseting the opacity for all rubbish and setting text to empty
 function clearEquation() {
-  rubbishInEquation.forEach(function (item) {
+  selectedRubbish.forEach(function (item) {
     item.style.opacity = "1";
   }); 
-  rubbishInEquation = [];
+  selectedRubbish = [];
   for(let i = 0; i <= 2; i++) {
     equation.children[i].textContent = "";
   }
