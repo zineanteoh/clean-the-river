@@ -147,6 +147,12 @@ function step(timestamp) {
     
     let child = children[i]; 
     child.style.left = limitMax(parseFloat(child.style.left) + (1 * rubbishFlowRate / 100), 0, 100) + "%";
+    // Deduct health if rubbish reaches end of river
+    if (child.style.left == "0%" & lives != "∞") {
+      lives--;
+      document.querySelector("#lives").textContent = lives;
+      console.log("Deduct one health!");
+    }
     child.style.top = parseFloat(child.style.top) + 0.1 * Math.sin(parseFloat(child.style.left)) + "%";
     
     if (progress >= 1) start = null;
