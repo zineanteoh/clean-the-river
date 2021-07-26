@@ -1,0 +1,12 @@
+{
+  "name": "clean-the-river",
+  "version": "1.0.0",
+  "description": "A web-based game that lets children practice forming and solving basic mathematical expressions by cleaning the river",
+  "scripts": {
+    "start": "serve"
+  },
+  "dependencies": {
+    "serve": "^10.0.1"
+  },
+  "author": "Zi Nean Teoh"
+}
