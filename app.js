@@ -23,7 +23,7 @@ init();
 
 // Initialize game
 function init() {
-  animateDuck.wander();
+  animateDuck.stayStill();
   // Add event listeners for user to select/deselect symbols
   const symbols = document.querySelectorAll(".select-symbol");
   for (let i = 0; i < symbols.length; i++) {
