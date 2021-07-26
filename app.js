@@ -1,172 +1,210 @@
-
+// Most commonly used variables
 let selectedRubbish = []; // keeps track of the selected rubbish that are in equation
 let numberCount = 0; // keeps track of how many 'numbers' are in river
 let symbolCount = 0; // keeps track of how many 'symbols' are in river
+let lives;
+let clearedRubbish = 0;
 
+// DOM Elements
 const river = document.querySelector(".river");
 const equation = document.querySelector(".equation");
-let lives = 0;
-let clearedRubbish = 0; 
 const hudItem = document.querySelectorAll(".hud-item");
 
-// Start the game based on the selected gamemode
+// Game Configurations
 let lapse; // time lapse between every new rubbish, in ms
 let rubbishLimit; // limit of rubbish in a river
 let rubbishFlowRate = 4; // rubbish flow rate. 4 is ideal
-let interval; // adds rubbish at the rate of rubbishInflow per second using setInterval()
+let rubbishIntervalID; // calls setInterval() and adds rubbish at the rate of rubbishInflow per second
 
-prepareGame();
-function prepareGame() {
-  // Add event listeners to symbols
+// Calls animateDuck so that its subfunctions can be called
+animateDuck();
+
+init();
+
+// Initialize game
+function init() {
+  animateDuck.wander();
+  // Add event listeners for user to select/deselect symbols
   const symbols = document.querySelectorAll(".select-symbol");
-  for(let i = 0; i < symbols.length; i++) {
-    symbols[i].addEventListener("click", function() {
+  for (let i = 0; i < symbols.length; i++) {
+    symbols[i].addEventListener("click", function () {
       symbols[i].classList.toggle("unselected");
     });
   }
 
   // Add event listeners to start game
   const startGameButton = document.querySelector(".start-game");
-  startGameButton.addEventListener("click", function() {
-    let plus = symbols[0].classList.contains("unselected") ? "" : "+";
-    let minus = symbols[1].classList.contains("unselected") ? "" : "-";
-    let multiply = symbols[2].classList.contains("unselected") ? "" : "x";
-    let symbolList = plus + minus + multiply;
+  startGameButton.addEventListener("click", function () {
+    let symbolList = getUserSelectedSymbols(symbols);
     let difficulty = document.getElementById("difficulty").value;
-    let health = document.getElementById("health").value;
-    if(symbolList != "") {
+    lives = document.getElementById("health").value;
+    if (symbolList != "") {
+      // Replaces screen
       document.querySelector(".menu").classList.add("hidden");
       document.querySelector(".gameplay").classList.remove("hidden");
-      document.querySelector("#title").remove();
+      document.querySelector(".main-title").classList.add("sub-title");
+      document.querySelector(".main-title").classList.remove("main-title");
       createEquationLog();
-      for(let i = 0; i < hudItem.length; i++) {
+      for (let i = 0; i < hudItem.length; i++) {
         hudItem[i].classList.remove("hidden");
       }
       // Start Game
-      startGame(symbolList, difficulty, health);
+      startGame(symbolList, difficulty, lives);
     } else {
       console.log("You have to select at least ONE symbol!");
     }
-
   });
 }
-
-// Adds event listener to equation slots, which allows user to de-select rubbish 
-const equationSlots = document.querySelectorAll(".equation-slot");
-for(let i = 0; i < equationSlots.length; i++) {
-  equationSlots[i].addEventListener("click", function() {
-    if (equationSlots[i].textContent != "") {
-      for(let j = 0; j < selectedRubbish.length; j++) {
-        if (selectedRubbish[j].textContent == equationSlots[i].textContent) {
-          // set greyed-out opacity back to 1
-          selectedRubbish[j].style.opacity = "1";
-          // remove the clicked rubbish from rubbishInEquation
-          selectedRubbish.splice(j, 1);
-          break;
-        }
-      }
-      equationSlots[i].textContent = "";
-    }
-  });
-}
-
-// Checks user answer when user presses [Enter] key
-equation.lastElementChild.addEventListener("keyup", function(event) {
-  if(event.keyCode === 13) {
-    if (selectedRubbish.length == 3) {
-      validateEquation();
-    } else {
-      console.log("This is not a valid expression!"); 
-    }
-  };
-});
 
 function startGame(symbolList, difficulty, health) {
+  prepareGame();
   console.log(symbolList, difficulty, health);
 
-  switch(difficulty) {
-    case 'easy':
+  // Configure game difficulty
+  switch (difficulty) {
+    case "easy":
       lapse = 5000;
       rubbishLimit = 18;
       break;
-    case 'normal':
+    case "normal":
       lapse = 3000;
       rubbishLimit = 24;
       break;
-    case 'hard':
+    case "hard":
       lapse = 2000;
       rubbishLimit = 30;
       break;
-    case 'insane':
-      lapse = 1000; 
+    case "insane":
+      lapse = 1000;
       rubbishLimit = 54;
       break;
   }
 
-  if(health != "inf") {
-    lives = parseFloat(health); 
-    document.querySelector("#lives").textContent = parseFloat(health); 
-  } else {
-    lives = "∞";
-    document.querySelector("#lives").textContent = "∞";
-  }
+  // Update HUD display
+  updateHUD();
 
-  document.querySelector("#rubbish-cleared").textContent = clearedRubbish;
-
-  // add rubbish
+  // Add rubbish objects using DOM
   let i = 0;
-  let initiateRubbish = setInterval(function() {
+  let initiateRubbish = setInterval(function () {
     addRubbish(symbolList);
     i++;
     if (i >= rubbishLimit) {
       clearInterval(initiateRubbish);
-      interval = setInterval(function() {
+      rubbishIntervalID = setInterval(function () {
         if (numberCount + symbolCount <= rubbishLimit) {
           addRubbish(symbolList);
         }
       }, lapse);
     }
   }, 1000);
+
+  // Animate the rubbish flow
+  animateRubbish();
+}
+
+// Prepares the game by adding event listeners
+function prepareGame() {
+  // Adds event listener to equation slots, which allows user to de-select rubbish
+  const equationSlots = document.querySelectorAll(".equation-slot");
+  for (let i = 0; i < equationSlots.length; i++) {
+    equationSlots[i].addEventListener("click", function () {
+      if (equationSlots[i].textContent != "") {
+        for (let j = 0; j < selectedRubbish.length; j++) {
+          if (selectedRubbish[j].textContent == equationSlots[i].textContent) {
+            // set greyed-out opacity back to 1
+            selectedRubbish[j].style.opacity = "1";
+            // remove the clicked rubbish from rubbishInEquation
+            selectedRubbish.splice(j, 1);
+            break;
+          }
+        }
+        equationSlots[i].textContent = "";
+      }
+    });
+  }
+
+  // Adds event listener to check user's answer when [Enter] key is pressed
+  equation.lastElementChild.addEventListener("keyup", function (event) {
+    if (event.keyCode === 13) {
+      if (selectedRubbish.length == 3) {
+        validateEquation();
+      } else {
+        console.log("This is not a valid expression!");
+      }
+    }
+  });
+}
+
+// Updates HUD (lives and rubbishCleared) using DOM
+function updateHUD() {
+  if (lives != "inf") {
+    lives = parseFloat(lives);
+    document.querySelector("#lives").textContent = parseFloat(lives);
+  } else {
+    lives = "∞";
+    document.querySelector("#lives").textContent = "∞";
+  }
+  document.querySelector("#rubbish-cleared").textContent = clearedRubbish;
 }
 
 // Animate rubbish
-// ...code template taken from the-art-of-web.com/javascript/animate-curved-path/
-let requestAnimationFrame = window.requestAnimationFrame || 
-                            window.mozRequestAnimationFrame || 
-                            window.webkitRequestAnimationFrame || 
-                            window.msRequestAnimationFrame; 
-let start = null; 
-function step(timestamp) {
-  // Animate rubbish
-  let children = river.children;
-  for(let i = 0; i < children.length; i++) {
-    let progress, x, y;
-    if (start === null) start = timestamp;
-    
-    progress = (timestamp - start) * rubbishFlowRate / 1000; // percent
-    
-    let child = children[i]; 
-    child.style.left = limitMax(parseFloat(child.style.left) + (1 * rubbishFlowRate / 100), 0, 100) + "%";
-    // Deduct health if rubbish reaches end of river
-    if (child.style.left == "0%" & lives != "∞") {
-      lives--;
-      document.querySelector("#lives").textContent = lives;
-      console.log("Deduct one health!");
+function animateRubbish() {
+  // ...code template taken from the-art-of-web.com/javascript/animate-curved-path/
+  let requestAnimationFrame =
+    window.requestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.msRequestAnimationFrame;
+  let start = null;
+  function step(timestamp) {
+    // Loop through and animate each rubbish
+    let children = river.children;
+    for (let i = 0; i < children.length; i++) {
+      let progress, x, y;
+      if (start === null) start = timestamp;
+
+      progress = ((timestamp - start) * rubbishFlowRate) / 1000; // percent
+
+      let child = children[i];
+      child.style.left =
+        limitMax(
+          parseFloat(child.style.left) + (1 * rubbishFlowRate) / 100,
+          0,
+          100
+        ) + "%";
+      // Deduct health if rubbish reaches end of river
+      if ((child.style.left == "0%") & (lives != "∞")) {
+        lives--;
+        document.querySelector("#lives").textContent = lives;
+        console.log("Deduct one health!");
+      }
+      child.style.top =
+        parseFloat(child.style.top) +
+        0.1 * Math.sin(parseFloat(child.style.left)) +
+        "%";
+
+      if (progress >= 1) start = null;
     }
-    child.style.top = parseFloat(child.style.top) + 0.1 * Math.sin(parseFloat(child.style.left)) + "%";
-    
-    if (progress >= 1) start = null;
+    requestAnimationFrame(step);
+
+    // Sets a value to min once it exceeds max
+    function limitMax(val, min, max) {
+      return val > max ? min : val;
+    }
   }
+
   requestAnimationFrame(step);
-
-  // Sets a value to min once it exceeds max
-  function limitMax(val, min, max) {
-    return val > max ? min : val; 
-  }
 }
-requestAnimationFrame(step);
 
-// Create and add a new div element to represent the equation log 
+// Returns a string of user selected symbols
+function getUserSelectedSymbols(symbols) {
+  let plus = symbols[0].classList.contains("unselected") ? "" : "+";
+  let minus = symbols[1].classList.contains("unselected") ? "" : "-";
+  let multiply = symbols[2].classList.contains("unselected") ? "" : "x";
+  return plus + minus + multiply;
+}
+
+// Create and add a new div element to represent the equation log
 function createEquationLog() {
   let eqLog = document.createElement("div");
   eqLog.classList.add("equationLog");
@@ -191,7 +229,7 @@ function addEquationLog(text, isCorrect) {
 }
 
 // Add rubbish (number or symbol) to river while maintaining a 2:1 ratio for number:symbol
-function addRubbish(symbolList) { 
+function addRubbish(symbolList) {
   let newRubbish;
   if (numberCount / 2 > symbolCount) {
     newRubbish = getNewSymbol(symbolList);
@@ -209,21 +247,21 @@ function addRubbish(symbolList) {
     }
   }
   // Set rubbish to a random position
-  newRubbish.style.top = Math.floor(Math.random() * 85) + "%"; 
-  newRubbish.style.left = "0%"; 
+  newRubbish.style.top = Math.floor(Math.random() * 85) + "%";
+  newRubbish.style.left = "0%";
   river.appendChild(newRubbish);
 }
 
-// Returns a HTML element with a random number 
+// Returns a HTML element with a random number
 function getNewNumber() {
   let newNumber = document.createElement("p");
   newNumber.textContent = Math.floor(Math.random() * 99) + 1; // Number Range
   newNumber.classList.add("rubbish");
   newNumber.classList.add("number");
-  newNumber.addEventListener("click", function() {
-    // Listens to click event. When clicked, add number to the equation if there is an empty slot 
+  newNumber.addEventListener("click", function () {
+    // Listens to click event. When clicked, add number to the equation if there is an empty slot
     if (newNumber.style.opacity == "1" || newNumber.style.opacity == "") {
-      // Finds if empty slot available in the equation, if so add rubbish 
+      // Finds if empty slot available in the equation, if so add rubbish
       if (equation.children[0].textContent == "") {
         equation.children[0].textContent = newNumber.textContent;
         newNumber.style.opacity = "0.5";
@@ -236,12 +274,14 @@ function getNewNumber() {
         console.log("Equation already has 2 numbers!");
       }
     } else {
-      // Removes rubbish from the equation 
+      // Removes rubbish from the equation
       newNumber.style.opacity = "1";
-      for(let i = 0; i < equationSlots.length; i++) {
+      for (let i = 0; i < equationSlots.length; i++) {
         if (equationSlots[i].textContent == newNumber.textContent) {
-          for(let j = 0; j < selectedRubbish.length; j++) {
-            if (selectedRubbish[j].textContent == equationSlots[i].textContent) {
+          for (let j = 0; j < selectedRubbish.length; j++) {
+            if (
+              selectedRubbish[j].textContent == equationSlots[i].textContent
+            ) {
               selectedRubbish[j].style.opacity = "1";
               selectedRubbish.splice(j, 1);
             }
@@ -261,7 +301,7 @@ function getNewSymbol(symbolList) {
   newSymbol.textContent = symbolList[n];
   newSymbol.classList.add("rubbish");
   newSymbol.classList.add("symbol");
-  newSymbol.addEventListener("click", function() {
+  newSymbol.addEventListener("click", function () {
     // Listens to click event. When clicked, add symbol to the equation if slot is empty
     if (newSymbol.style.opacity == "1" || newSymbol.style.opacity == "") {
       if (equation.children[1].textContent == "") {
@@ -270,14 +310,16 @@ function getNewSymbol(symbolList) {
         selectedRubbish.push(newSymbol);
       } else {
         console.log("Equation already has a mathematical symbol!");
-      };
+      }
     } else {
       // Removes rubbish from the equation
       newSymbol.style.opacity = "1";
-      for(let i = 0; i < equationSlots.length; i++) {
+      for (let i = 0; i < equationSlots.length; i++) {
         if (equationSlots[i].textContent == newSymbol.textContent) {
-          for(let j = 0; j < selectedRubbish.length; j++) {
-            if (selectedRubbish[j].textContent == equationSlots[i].textContent) {
+          for (let j = 0; j < selectedRubbish.length; j++) {
+            if (
+              selectedRubbish[j].textContent == equationSlots[i].textContent
+            ) {
               selectedRubbish[j].style.opacity = "1";
               selectedRubbish.splice(j, 1);
             }
@@ -295,14 +337,14 @@ function validateEquation() {
   let eq = equation.children;
   let left = "";
   let right = equation.lastElementChild.value;
-  for(let i = 0; i <= 2; i++) {
+  for (let i = 0; i <= 2; i++) {
     left += eq[i].textContent + " ";
   }
   if (eval(left.replace("x", "*")) == eval(right)) {
     clearedRubbish += 3;
     symbolCount--;
     numberCount -= 2;
-    // Update Lives & Rubbish Cleared 
+    // Update Lives & Rubbish Cleared
     document.querySelector("#lives").textContent = lives;
     document.querySelector("#rubbish-cleared").textContent = clearedRubbish;
     console.log("Correct! " + left + " = " + eval(right));
@@ -310,12 +352,15 @@ function validateEquation() {
     cleanRubbish();
   } else {
     console.log("Oops Wrong Answer! " + left + " is not " + eval(right));
-    addEquationLog(left + "= " + "<span class='wrong-wavy'>" + eval(right) + "*</span>", false);
+    addEquationLog(
+      left + "= " + "<span class='wrong-wavy'>" + eval(right) + "*</span>",
+      false
+    );
     clearEquation();
   }
 }
 
-// Removes rubbish from the river and calls clearEquation() 
+// Removes rubbish from the river and calls clearEquation()
 function cleanRubbish() {
   selectedRubbish.forEach(function (item) {
     item.remove();
@@ -329,10 +374,103 @@ function cleanRubbish() {
 function clearEquation() {
   selectedRubbish.forEach(function (item) {
     item.style.opacity = "1";
-  }); 
+  });
   selectedRubbish = [];
-  for(let i = 0; i <= 2; i++) {
+  for (let i = 0; i <= 2; i++) {
     equation.children[i].textContent = "";
   }
   equation.lastElementChild.value = "";
+}
+
+// Animate Duck
+function animateDuck() {
+  let duckImg = document.getElementById("duck-img");
+  let duck = document.querySelector(".duck");
+
+  let duckID; // variable to clear setInterval()
+  let position; // start position for image slider
+  const interval = 200; // 200 ms of interval for setInterval()
+  let isFacingRight = true; // keeps track of which direction duck is facing
+
+  duck.style.left = "5%"; // set duck's initial position
+
+  function wander() {
+    clearInterval(duckID);
+  }
+
+  function walkLeft() {
+    clearInterval(duckID);
+    if (isFacingRight) {
+      // Flip image horizontally
+      duckImg.style.transform = "scale(7.0) scaleX(-1)";
+    }
+    duckID = setInterval(() => {
+      duckImg.style.backgroundPosition = `-${position}px 0px`;
+      if (position < 36) {
+        position += 12;
+      } else {
+        position = 12;
+      }
+      duck.style.left = parseFloat(duck.style.left) - 0.5 + "%";
+    }, interval);
+    isFacingRight = false;
+  }
+
+  function walkRight() {
+    position = 12;
+    clearInterval(duckID);
+    if (!isFacingRight) {
+      // Flip image horizontally
+      duckImg.style.transform = "scale(7.0) scaleX(1)";
+    }
+    duckID = setInterval(() => {
+      duckImg.style.backgroundPosition = `-${position}px 0px`;
+      if (position < 36) {
+        position += 12;
+      } else {
+        position = 12;
+      }
+      duck.style.left = parseFloat(duck.style.left) + 0.5 + "%";
+    }, interval);
+    isFacingRight = true;
+  }
+
+  function beHappy() {
+    clearInterval(duckID);
+    console.log("happy");
+  }
+
+  function beSad() {
+    position = 12;
+    clearInterval(duckID);
+    duckID = setInterval(() => {
+      duckImg.style.backgroundPosition = `-${position}px -12px`;
+      if (position < 24) {
+        position += 12;
+      } else {
+        position = 0;
+      }
+    }, interval * 5);
+  }
+
+  function stayStill() {
+    position = 0;
+    clearInterval(duckID);
+    duckID = setInterval(() => {
+      duckImg.style.backgroundPosition = `-${position}px 0px`;
+      if (position < 12) {
+        position += 12;
+      } else {
+        position = 0;
+      }
+    }, interval * 5); // increase interval for stayStill()
+  }
+
+  // Allow subfunctions to be called from outside
+  animateDuck.wander = wander;
+  animateDuck.walkLeft = walkLeft;
+  animateDuck.walkRight = walkRight;
+  animateDuck.beHappy = beHappy;
+  animateDuck.beSad = beSad;
+  animateDuck.stayStill = stayStill;
 }

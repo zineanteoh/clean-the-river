@@ -1,8 +1,7 @@
-
 /* Actual code below */
 :root {
   --river: rgb(11, 136, 219); /* #0B88DB */
-  --lightblue: rgb(148,212,252); /* #94D4FC */
+  --lightblue: rgb(148, 212, 252); /* #94D4FC */
   --number: rgb(50, 212, 0);
   --symbol: rgb(235, 157, 12);
 }
@@ -11,9 +10,9 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'VT323', monospace;
+  font-family: "VT323", monospace;
   /* font-weight: bold; */
-} 
+}
 
 body {
   background-color: var(--river);
@@ -32,7 +31,7 @@ header {
   padding: 20px;
   height: 220px;
   /* background-color: aqua; */
-} 
+}
 
 .header-content {
   text-align: center;
@@ -45,11 +44,16 @@ header {
 .hud {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin: 0 auto;
   width: 300px;
 }
 
-#title {
+.hud-item:first-child {
+  margin-bottom: 1px;
+}
+
+.main-title {
   color: var(--river);
   text-align: center;
   position: absolute;
@@ -57,10 +61,17 @@ header {
   right: 0;
   margin: 50px auto;
   width: 100%;
-  font-size: 90px; 
+  font-size: 90px;
   /* margin: 20px auto; */
   /* font-size: 2rem; */
   /* background-color: pink; */
+}
+
+.sub-title {
+  color: var(--river);
+  font-size: 28px;
+  position: absolute;
+  left: 50px;
 }
 
 .hud-item {
@@ -75,13 +86,16 @@ header {
   background-color: rgb(230, 245, 255);
   overflow: auto;
   margin: 3px auto;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
 }
 
 .logText {
   padding: 2px;
   margin-bottom: 3px;
   font-size: 30px;
-} 
+}
 
 .correct {
   color: rgb(12, 144, 46);
@@ -93,6 +107,22 @@ header {
 
 .wrong-wavy {
   text-decoration: rgb(212, 68, 68, 0.7) wavy underline;
+}
+
+.duck {
+  position: absolute;
+  top: 177px;
+}
+
+#duck-img {
+  height: 11px;
+  width: 11px;
+  background: url("img/Duck\ assets\ pack.png");
+  background-position: 0px 0px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  transform: scale(7);
 }
 
 /*  ----------------- Gamemode Selection ----------------- */
@@ -140,7 +170,8 @@ header {
   animation-fill-mode: forwards;
 }
 
-#difficulty, #health {
+#difficulty,
+#health {
   font-size: 22px;
 }
 
@@ -155,7 +186,8 @@ header {
   }
 }
 
-#difficulty, #health {
+#difficulty,
+#health {
   height: 25px;
   width: 80%;
   margin: 0 15%;
@@ -248,7 +280,7 @@ header {
 .river-img {
   /* top: -100px; */
   height: 59vh;
-  width: 100%;;
+  width: 100%;
   /* height: 500px; */
 }
 

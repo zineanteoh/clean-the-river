@@ -1,92 +1,92 @@
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clean The River - Maths Game</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-</head>
-<body>
-  <!-- Header -->
-  <header>
-    <h1 id="title">Let's Clean The River!</h1>
-    <div class="header-content">
-      <!-- Keeps track of user's score and time -->
-      <div class="hud">
-        <div class="hud-item hidden">Lives: <span id="lives"></span></div>
-        <div class="hud-item hidden">Rubbish Cleared: <span id="rubbish-cleared"></span></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clean The River - Maths Game</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Header -->
+    <header>
+      <h1 class="main-title">Let's Clean The River!</h1>
+      <div class="header-content">
+        <!-- Keeps track of user's score and time -->
+        <div class="hud">
+          <div class="hud-item hidden">Lives: <span id="lives"></span></div>
+          <div class="hud-item hidden">
+            Rubbish Cleared: <span id="rubbish-cleared"></span>
+          </div>
+        </div>
       </div>
-    </div>
-  </header>
+      <div class="duck">
+        <p id="duck-img"></p>
+      </div>
+    </header>
 
-  <main> 
-    <!-- Choose Your Gamemode -->
-    <div class="menu">
-      <p class="menu-title">Choose Your Gamemode</p>
-      <table class="gamemode">
-        <tr>
-          <td class="mode-label">
-            Symbols:
-          </td>
-          <td class="mode-option">
-            <div class="select-symbol">+</div>
-            <div class="select-symbol">-</div>
-            <div class="select-symbol unselected">x</div>
-          </td>
-        </tr>
-        <tr>
-          <td class="mode-label">
-            Difficulty:
-          </td>
-          <td class="mode-option">
-            <select name="difficulty" id="difficulty">
-              <option value="easy">Easy</option>
-              <option value="normal">Normal</option>
-              <option value="hard">Hard</option>
-              <option value="insane">Insane</option>
-            </select>
-          </td>
-        </tr>
-        <tr>
-          <td class="mode-label">
-            Health:
-          </td>
-          <td class="mode-option">
-            <select name="health" id="health">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="inf" selected="selected">Unlimited</option>
-            </select>
-          </td>
-        </tr>
-      </table>
-      <p class="start-game">Start Game</p>
-    </div>
-
-    <!-- Start Game -->
-    <div class="gameplay hidden">
-      <div class="equation">
-        <!-- Javascript to populate stuffs here -->
-        <span class="equation-slot" id="slot-1"></span>
-        <span class="equation-slot" id="slot-2"></span>
-        <span class="equation-slot" id="slot-3"></span>
-        <span>=</span>
-        <!-- Last Child is for user input -->
-        <input type="text" class="user-input" maxlength="4" placeholder="0">
+    <main>
+      <!-- Choose Your Gamemode -->
+      <div class="menu">
+        <p class="menu-title">Choose Your Gamemode</p>
+        <table class="gamemode">
+          <tr>
+            <td class="mode-label">Symbols:</td>
+            <td class="mode-option">
+              <div class="select-symbol">+</div>
+              <div class="select-symbol">-</div>
+              <div class="select-symbol unselected">x</div>
+            </td>
+          </tr>
+          <tr>
+            <td class="mode-label">Difficulty:</td>
+            <td class="mode-option">
+              <select name="difficulty" id="difficulty">
+                <option value="easy">Easy</option>
+                <option value="normal">Normal</option>
+                <option value="hard">Hard</option>
+                <option value="insane">Insane</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td class="mode-label">Lives:</td>
+            <td class="mode-option">
+              <select name="health" id="health">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="inf" selected="selected">Unlimited</option>
+              </select>
+            </td>
+          </tr>
+        </table>
+        <p class="start-game">Start Game</p>
       </div>
 
-      <div class="river">
-        <!-- Fancy Javascript to populate stuffs here -->
-        <img src="img/river.png" alt="river" class="river-img">
-      </div>
-    </div>
+      <!-- Start Game -->
+      <div class="gameplay hidden">
+        <div class="equation">
+          <!-- Javascript to populate stuffs here -->
+          <span class="equation-slot" id="slot-1"></span>
+          <span class="equation-slot" id="slot-2"></span>
+          <span class="equation-slot" id="slot-3"></span>
+          <span>=</span>
+          <!-- Last Child is for user input -->
+          <input type="text" class="user-input" maxlength="4" placeholder="0" />
+        </div>
 
-  </main>
-  <script src="app.js"></script>
-</body>
+        <div class="river">
+          <!-- Fancy Javascript to populate stuffs here -->
+          <img src="img/river.png" alt="river" class="river-img" />
+        </div>
+      </div>
+    </main>
+    <script src="app.js"></script>
+  </body>
 </html>
