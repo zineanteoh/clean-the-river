@@ -99,13 +99,13 @@ function startGame(symbolList, difficulty, health) {
   }, 1000);
 
   // Animate the rubbish flow
-  animateRubbish();
+  animateRiver();
 }
 
 // Prepares the game by adding event listeners
+const equationSlots = document.querySelectorAll(".equation-slot");
 function prepareGame() {
   // Adds event listener to equation slots, which allows user to de-select rubbish
-  const equationSlots = document.querySelectorAll(".equation-slot");
   for (let i = 0; i < equationSlots.length; i++) {
     equationSlots[i].addEventListener("click", function () {
       if (equationSlots[i].textContent != "") {
@@ -147,8 +147,8 @@ function updateHUD() {
   document.querySelector("#rubbish-cleared").textContent = clearedRubbish;
 }
 
-// Animate rubbish
-function animateRubbish() {
+// Animate river's rubbish
+function animateRiver() {
   // ...code template taken from the-art-of-web.com/javascript/animate-curved-path/
   let requestAnimationFrame =
     window.requestAnimationFrame ||
@@ -341,16 +341,18 @@ function validateEquation() {
     left += eq[i].textContent + " ";
   }
   if (eval(left.replace("x", "*")) == eval(right)) {
+    // Right answer!
+    console.log("Correct! " + left + " = " + eval(right));
     clearedRubbish += 3;
     symbolCount--;
     numberCount -= 2;
     // Update Lives & Rubbish Cleared
     document.querySelector("#lives").textContent = lives;
     document.querySelector("#rubbish-cleared").textContent = clearedRubbish;
-    console.log("Correct! " + left + " = " + eval(right));
     addEquationLog(left + "= " + eval(right), true);
     cleanRubbish();
   } else {
+    // Wrong answer!
     console.log("Oops Wrong Answer! " + left + " is not " + eval(right));
     addEquationLog(
       left + "= " + "<span class='wrong-wavy'>" + eval(right) + "*</span>",
@@ -387,63 +389,64 @@ function animateDuck() {
   let duckImg = document.getElementById("duck-img");
   let duck = document.querySelector(".duck");
 
-  let duckID; // variable to clear setInterval()
+  let moveID; // variable to clear setInterval()
   let position; // start position for image slider
-  const interval = 200; // 200 ms of interval for setInterval()
   let isFacingRight = true; // keeps track of which direction duck is facing
+  const interval = 200; // 200 ms of interval for setInterval()
+  const walkingSpeed = 2;
 
-  duck.style.left = "5%"; // set duck's initial position
+  duck.style.left = "15%"; // set duck's initial position
 
   function wander() {
-    clearInterval(duckID);
+    clearInterval(moveID);
   }
 
   function walkLeft() {
-    clearInterval(duckID);
+    clearInterval(moveID);
     if (isFacingRight) {
       // Flip image horizontally
       duckImg.style.transform = "scale(7.0) scaleX(-1)";
     }
-    duckID = setInterval(() => {
+    moveID = setInterval(() => {
       duckImg.style.backgroundPosition = `-${position}px 0px`;
       if (position < 36) {
         position += 12;
       } else {
         position = 12;
       }
-      duck.style.left = parseFloat(duck.style.left) - 0.5 + "%";
+      duck.style.left = parseFloat(duck.style.left) - walkingSpeed + "%";
     }, interval);
     isFacingRight = false;
   }
 
   function walkRight() {
     position = 12;
-    clearInterval(duckID);
+    clearInterval(moveID);
     if (!isFacingRight) {
       // Flip image horizontally
       duckImg.style.transform = "scale(7.0) scaleX(1)";
     }
-    duckID = setInterval(() => {
+    moveID = setInterval(() => {
       duckImg.style.backgroundPosition = `-${position}px 0px`;
       if (position < 36) {
         position += 12;
       } else {
         position = 12;
       }
-      duck.style.left = parseFloat(duck.style.left) + 0.5 + "%";
+      duck.style.left = parseFloat(duck.style.left) + walkingSpeed + "%";
     }, interval);
     isFacingRight = true;
   }
 
   function beHappy() {
-    clearInterval(duckID);
+    clearInterval(moveID);
     console.log("happy");
   }
 
   function beSad() {
     position = 12;
-    clearInterval(duckID);
-    duckID = setInterval(() => {
+    clearInterval(moveID);
+    moveID = setInterval(() => {
       duckImg.style.backgroundPosition = `-${position}px -12px`;
       if (position < 24) {
         position += 12;
@@ -455,8 +458,8 @@ function animateDuck() {
 
   function stayStill() {
     position = 0;
-    clearInterval(duckID);
-    duckID = setInterval(() => {
+    clearInterval(moveID);
+    moveID = setInterval(() => {
       duckImg.style.backgroundPosition = `-${position}px 0px`;
       if (position < 12) {
         position += 12;
@@ -474,3 +477,6 @@ function animateDuck() {
   animateDuck.beSad = beSad;
   animateDuck.stayStill = stayStill;
 }
+
+// Animate rubbish monster
+function animateRubbishMonster() {}

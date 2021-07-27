@@ -43,14 +43,9 @@ header {
 
 .hud {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: center;
-  margin: 0 auto;
-  width: 300px;
-}
-
-.hud-item:first-child {
-  margin-bottom: 1px;
+  align-items: flex-start;
 }
 
 .main-title {
@@ -62,16 +57,14 @@ header {
   margin: 50px auto;
   width: 100%;
   font-size: 90px;
-  /* margin: 20px auto; */
-  /* font-size: 2rem; */
-  /* background-color: pink; */
 }
 
 .sub-title {
   color: var(--river);
   font-size: 28px;
   position: absolute;
-  left: 50px;
+  text-align: center;
+  width: 100%;
 }
 
 .hud-item {
@@ -85,10 +78,7 @@ header {
   border: 5px ridge var(--lightblue);
   background-color: rgb(230, 245, 255);
   overflow: auto;
-  margin: 3px auto;
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, 0);
+  margin: -25px auto;
 }
 
 .logText {
@@ -123,6 +113,18 @@ header {
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
   transform: scale(7);
+}
+
+.rubbish-monster {
+  position: absolute;
+  top: 43px;
+  right: 2%;
+}
+
+#rubbish-monster-img {
+  width: 300px;
+  height: 178px;
+  background: url("img/rubbish_hill.png");
 }
 
 /*  ----------------- Gamemode Selection ----------------- */
@@ -229,7 +231,7 @@ header {
   width: 500px;
   height: 65px;
   text-align: center;
-  color: rgb(35 112 160);
+  color: white;
   font-size: 38px;
   border-radius: 5px;
   padding: 5px 10px;
