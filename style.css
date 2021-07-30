@@ -29,7 +29,7 @@ body {
 header {
   background: white;
   padding: 20px;
-  height: 220px;
+  height: 150px;
   /* background-color: aqua; */
 }
 
@@ -56,15 +56,7 @@ header {
   right: 0;
   margin: 50px auto;
   width: 100%;
-  font-size: 90px;
-}
-
-.sub-title {
-  color: var(--river);
-  font-size: 28px;
-  position: absolute;
-  text-align: center;
-  width: 100%;
+  font-size: 70px;
 }
 
 .hud-item {
@@ -72,13 +64,13 @@ header {
   color: var(--river);
 }
 
-.equationLog {
-  height: 160px;
-  width: 600px;
+.equation-log {
+  height: 120px;
+  width: 400px;
   border: 5px ridge var(--lightblue);
   background-color: rgb(230, 245, 255);
   overflow: auto;
-  margin: -25px auto;
+  margin: -60px auto;
 }
 
 .logText {
@@ -101,7 +93,7 @@ header {
 
 .duck {
   position: absolute;
-  top: 177px;
+  top: 107px;
 }
 
 #duck-img {
@@ -117,7 +109,7 @@ header {
 
 .rubbish-monster {
   position: absolute;
-  top: 43px;
+  top: 0px;
   right: 2%;
 }
 
@@ -125,6 +117,7 @@ header {
   width: 300px;
   height: 178px;
   background: url("img/rubbish_hill.png");
+  transform: scale(0.7);
 }
 
 /*  ----------------- Gamemode Selection ----------------- */
@@ -195,23 +188,34 @@ header {
   margin: 0 15%;
 }
 
+.return-home,
 .start-game {
-  font-size: 1.7rem;
   background-color: var(--river);
-  width: 150px;
-  padding: 10px;
-  margin: auto;
-  cursor: pointer;
   color: white;
+  padding: 10px;
+  cursor: pointer;
 }
 
-.start-game:hover {
+.return-home {
+  position: absolute;
+  font-size: 1.4rem;
+  width: 60px;
+  margin-top: 70px;
+}
+
+.start-game {
+  font-size: 1.7rem;
+  width: 150px;
+  margin: auto;
+}
+
+.start-game:hover,
+.return-home:hover {
   background-color: var(--river);
   opacity: 0.7;
   animation-name: start;
   animation-duration: 0.3s;
   animation-fill-mode: forwards;
-  /* width: 200px; */
 }
 
 @keyframes start {

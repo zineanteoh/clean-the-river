@@ -2,28 +2,30 @@
 let selectedRubbish = []; // keeps track of the selected rubbish that are in equation
 let numberCount = 0; // keeps track of how many 'numbers' are in river
 let symbolCount = 0; // keeps track of how many 'symbols' are in river
-let lives;
-let clearedRubbish = 0;
+let lives; // number of lives user have
+let score = 0; // number of equations correctly solved by user
 
 // DOM Elements
 const river = document.querySelector(".river");
+const equationSlots = document.querySelectorAll(".equation-slot");
 const equation = document.querySelector(".equation");
-const hudItem = document.querySelectorAll(".hud-item");
 
 // Game Configurations
 let lapse; // time lapse between every new rubbish, in ms
 let rubbishLimit; // limit of rubbish in a river
 let rubbishFlowRate = 4; // rubbish flow rate. 4 is ideal
-let rubbishIntervalID; // calls setInterval() and adds rubbish at the rate of rubbishInflow per second
+let initiateRubbishID; // id to clear interval
+let rubbishIntervalID; // id to clear interval
+let isGameRunning = true;
 
-// Calls animateDuck so that its subfunctions can be called
 animateDuck();
+animateDuck.stayStill();
+animationLoop();
+addEventListeners();
 
-init();
-
-// Initialize game
-function init() {
-  animateDuck.stayStill();
+// Initialize game (called only once)
+function addEventListeners() {
+  addUserEventListeners();
   // Add event listeners for user to select/deselect symbols
   const symbols = document.querySelectorAll(".select-symbol");
   for (let i = 0; i < symbols.length; i++) {
@@ -33,8 +35,7 @@ function init() {
   }
 
   // Add event listeners to start game
-  const startGameButton = document.querySelector(".start-game");
-  startGameButton.addEventListener("click", function () {
+  document.querySelector(".start-game").addEventListener("click", function () {
     let symbolList = getUserSelectedSymbols(symbols);
     let difficulty = document.getElementById("difficulty").value;
     lives = document.getElementById("health").value;
@@ -42,22 +43,22 @@ function init() {
       // Replaces screen
       document.querySelector(".menu").classList.add("hidden");
       document.querySelector(".gameplay").classList.remove("hidden");
-      document.querySelector(".main-title").classList.add("sub-title");
-      document.querySelector(".main-title").classList.remove("main-title");
-      createEquationLog();
-      for (let i = 0; i < hudItem.length; i++) {
-        hudItem[i].classList.remove("hidden");
-      }
+      document.querySelector(".main-title").classList.add("hidden");
+      document.querySelector(".hud").classList.remove("hidden");
       // Start Game
       startGame(symbolList, difficulty, lives);
     } else {
       console.log("You have to select at least ONE symbol!");
     }
   });
+
+  // Add event listener to allow user to exit game
+  document.querySelector(".return-home").addEventListener("click", function () {
+    returnHome();
+  });
 }
 
 function startGame(symbolList, difficulty, health) {
-  prepareGame();
   console.log(symbolList, difficulty, health);
 
   // Configure game difficulty
@@ -85,26 +86,56 @@ function startGame(symbolList, difficulty, health) {
 
   // Add rubbish objects using DOM
   let i = 0;
-  let initiateRubbish = setInterval(function () {
-    addRubbish(symbolList);
-    i++;
-    if (i >= rubbishLimit) {
-      clearInterval(initiateRubbish);
-      rubbishIntervalID = setInterval(function () {
-        if (numberCount + symbolCount <= rubbishLimit) {
-          addRubbish(symbolList);
-        }
-      }, lapse);
+  initiateRubbishID = setInterval(function () {
+    if (isGameRunning) {
+      addRubbish(symbolList);
+      i++;
+      if (i >= rubbishLimit) {
+        clearInterval(initiateRubbishID);
+        rubbishIntervalID = setInterval(function () {
+          if (isGameRunning) {
+            if (numberCount + symbolCount <= rubbishLimit) {
+              addRubbish(symbolList);
+            }
+          }
+        }, lapse);
+      }
     }
   }, 1000);
 
   // Animate the rubbish flow
-  animateRiver();
+  animationLoop.startAnimation();
 }
 
-// Prepares the game by adding event listeners
-const equationSlots = document.querySelectorAll(".equation-slot");
-function prepareGame() {
+// Returns to home screen
+function returnHome() {
+  clearInterval(initiateRubbishID);
+  clearInterval(rubbishIntervalID);
+  document.querySelector(".menu").classList.remove("hidden");
+  document.querySelector(".gameplay").classList.add("hidden");
+  document.querySelector(".main-title").classList.remove("hidden");
+  document.querySelector(".hud").classList.add("hidden");
+  animationLoop.stopAnimation();
+  // Resets all variables
+  selectedRubbish = [];
+  numberCount = 0;
+  symbolCount = 0;
+  lives = undefined;
+  score = 0;
+  let allRubbish = document.querySelectorAll(".rubbish");
+  for (let i = 0; i < allRubbish.length; i++) {
+    allRubbish[i].remove();
+  }
+  let equationLog = document.querySelector(".equation-log");
+  while (equationLog.firstChild) {
+    equationLog.removeChild(equationLog.firstChild);
+  }
+  initiateRubbishID = undefined; // id to clear interval
+  rubbishIntervalID = undefined; // id to clear interval
+}
+
+// Adds event listeners to allow user to interact with objects
+function addUserEventListeners() {
   // Adds event listener to equation slots, which allows user to de-select rubbish
   for (let i = 0; i < equationSlots.length; i++) {
     equationSlots[i].addEventListener("click", function () {
@@ -144,26 +175,29 @@ function updateHUD() {
     lives = "∞";
     document.querySelector("#lives").textContent = "∞";
   }
-  document.querySelector("#rubbish-cleared").textContent = clearedRubbish;
+  document.querySelector("#rubbish-cleared").textContent = score;
 }
 
-// Animate river's rubbish
-function animateRiver() {
+// Animation loop to animate river's rubbish
+function animationLoop() {
   // ...code template taken from the-art-of-web.com/javascript/animate-curved-path/
+  let requestID;
   let requestAnimationFrame =
     window.requestAnimationFrame ||
     window.mozRequestAnimationFrame ||
     window.webkitRequestAnimationFrame ||
     window.msRequestAnimationFrame;
+  let cancelAnimationFrame =
+    window.cancelAnimationFrame || window.mozCancelAnimationFrame;
   let start = null;
   function step(timestamp) {
     // Loop through and animate each rubbish
     let children = river.children;
     for (let i = 0; i < children.length; i++) {
       let progress, x, y;
-      if (start === null) start = timestamp;
+      if (startAnimation === null) startAnimation = timestamp;
 
-      progress = ((timestamp - start) * rubbishFlowRate) / 1000; // percent
+      progress = ((timestamp - startAnimation) * rubbishFlowRate) / 1000; // percent
 
       let child = children[i];
       child.style.left =
@@ -174,18 +208,23 @@ function animateRiver() {
         ) + "%";
       // Deduct health if rubbish reaches end of river
       if ((child.style.left == "0%") & (lives != "∞")) {
-        lives--;
-        document.querySelector("#lives").textContent = lives;
-        console.log("Deduct one health!");
+        if (lives == 0) {
+          endGame();
+          console.log("Game over...");
+        } else {
+          lives--;
+          document.querySelector("#lives").textContent = lives;
+          console.log("You lost a health!");
+        }
       }
       child.style.top =
         parseFloat(child.style.top) +
         0.1 * Math.sin(parseFloat(child.style.left)) +
         "%";
 
-      if (progress >= 1) start = null;
+      if (progress >= 1) startAnimation = null;
     }
-    requestAnimationFrame(step);
+    requestID = requestAnimationFrame(step);
 
     // Sets a value to min once it exceeds max
     function limitMax(val, min, max) {
@@ -193,7 +232,20 @@ function animateRiver() {
     }
   }
 
-  requestAnimationFrame(step);
+  // Stops rubbish animation and pauses agme
+  function stopAnimation() {
+    cancelAnimationFrame(requestID);
+    isGameRunning = false;
+  }
+
+  // Starts rubbish animation
+  function startAnimation() {
+    requestID = requestAnimationFrame(step);
+    isGameRunning = true;
+  }
+
+  animationLoop.stopAnimation = stopAnimation;
+  animationLoop.startAnimation = startAnimation;
 }
 
 // Returns a string of user selected symbols
@@ -204,16 +256,9 @@ function getUserSelectedSymbols(symbols) {
   return plus + minus + multiply;
 }
 
-// Create and add a new div element to represent the equation log
-function createEquationLog() {
-  let eqLog = document.createElement("div");
-  eqLog.classList.add("equationLog");
-  document.querySelector(".header-content").appendChild(eqLog);
-}
-
 // Create and insert user-entered equation to the equation log
 function addEquationLog(text, isCorrect) {
-  let eqLog = document.querySelector(".equationLog");
+  let eqLog = document.querySelector(".equation-log");
   let newEq = document.createElement("p");
   newEq.classList.add("logText");
   if (isCorrect) {
@@ -343,12 +388,12 @@ function validateEquation() {
   if (eval(left.replace("x", "*")) == eval(right)) {
     // Right answer!
     console.log("Correct! " + left + " = " + eval(right));
-    clearedRubbish += 3;
+    score++;
     symbolCount--;
     numberCount -= 2;
     // Update Lives & Rubbish Cleared
     document.querySelector("#lives").textContent = lives;
-    document.querySelector("#rubbish-cleared").textContent = clearedRubbish;
+    document.querySelector("#rubbish-cleared").textContent = score;
     addEquationLog(left + "= " + eval(right), true);
     cleanRubbish();
   } else {
@@ -397,8 +442,8 @@ function animateDuck() {
 
   duck.style.left = "15%"; // set duck's initial position
 
-  function wander() {
-    clearInterval(moveID);
+  function speak(text) {
+    // Speak text
   }
 
   function walkLeft() {
@@ -456,6 +501,10 @@ function animateDuck() {
     }, interval * 5);
   }
 
+  function panic() {
+    clearInterval(moveID);
+  }
+
   function stayStill() {
     position = 0;
     clearInterval(moveID);
@@ -470,13 +519,10 @@ function animateDuck() {
   }
 
   // Allow subfunctions to be called from outside
-  animateDuck.wander = wander;
   animateDuck.walkLeft = walkLeft;
   animateDuck.walkRight = walkRight;
   animateDuck.beHappy = beHappy;
   animateDuck.beSad = beSad;
+  animateDuck.panic = panic;
   animateDuck.stayStill = stayStill;
 }
-
-// Animate rubbish monster
-function animateRubbishMonster() {}
