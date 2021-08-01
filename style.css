@@ -4,6 +4,9 @@
   --lightblue: rgb(148, 212, 252); /* #94D4FC */
   --number: rgb(50, 212, 0);
   --symbol: rgb(235, 157, 12);
+  --Speech-Bubble-Border: #222;
+  --Speech-Bubble-Background: #fcfcfc;
+  --Speech-Bubble-Text: #000;
 }
 
 * {
@@ -120,6 +123,21 @@ header {
   transform: scale(0.7);
 }
 
+/* .highscore {
+  position: absolute;
+  right: 5%;
+  top: 150px;
+  margin-top: 30px;
+  font-size: 28px;
+  padding: 5px 10px 5px 20px;
+  background-color: var(--river);
+  border-radius: 10px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  width: 230px;
+} */
+
 /*  ----------------- Gamemode Selection ----------------- */
 .menu {
   margin-top: 2%;
@@ -192,7 +210,6 @@ header {
 .start-game {
   background-color: var(--river);
   color: white;
-  padding: 10px;
   cursor: pointer;
 }
 
@@ -201,12 +218,14 @@ header {
   font-size: 1.4rem;
   width: 60px;
   margin-top: 70px;
+  padding: 10px;
 }
 
 .start-game {
   font-size: 1.7rem;
   width: 150px;
   margin: auto;
+  padding: 10px;
 }
 
 .start-game:hover,
@@ -309,4 +328,85 @@ header {
 
 .symbol {
   background-color: var(--symbol);
+}
+
+/* Speech bubble */
+
+#speech-bubble {
+  margin-top: -105px;
+  margin-left: 35px;
+  width: 150px;
+}
+
+#bub-part-a {
+  margin-left: 6px;
+  width: calc(100% - 16px);
+  height: 2px;
+  background: var(--Speech-Bubble-Border);
+}
+
+#bub-part-b {
+  margin-left: 4px;
+  width: calc(100% - 12px);
+  height: 2px;
+  background: var(--Speech-Bubble-Background);
+  border-left: 2px solid var(--Speech-Bubble-Border);
+  border-right: 2px solid var(--Speech-Bubble-Border);
+}
+
+#bub-part-c {
+  margin-left: 2px;
+  width: calc(100% - 8px);
+  height: 2px;
+  background: var(--Speech-Bubble-Background);
+  border-left: 2px solid var(--Speech-Bubble-Border);
+  border-right: 2px solid var(--Speech-Bubble-Border);
+}
+
+#speech-txt {
+  width: calc(100% - 4px);
+  padding: 10px;
+  font-size: 18px;
+  color: var(--Speech-Bubble-Text);
+  text-align: center;
+  background: var(--Speech-Bubble-Background);
+  border-left: 2px solid var(--Speech-Bubble-Border);
+  border-right: 2px solid var(--Speech-Bubble-Border);
+}
+
+#speech-arrow {
+  margin-top: -2px;
+  margin-left: 20px;
+}
+
+#arrow-w {
+  width: 8px;
+  height: 8px;
+  background: var(--Speech-Bubble-Background);
+  border-left: 2px solid var(--Speech-Bubble-Border);
+  border-right: 2px solid var(--Speech-Bubble-Border);
+}
+
+#arrow-x {
+  width: 6px;
+  height: 2px;
+  background: var(--Speech-Bubble-Background);
+  border-left: 2px solid var(--Speech-Bubble-Border);
+  border-right: 2px solid var(--Speech-Bubble-Border);
+}
+
+#arrow-y {
+  margin-left: -2px;
+  width: 6px;
+  height: 2px;
+  background: var(--Speech-Bubble-Background);
+  border-left: 2px solid var(--Speech-Bubble-Border);
+  border-right: 2px solid var(--Speech-Bubble-Border);
+}
+
+#arrow-z {
+  margin-left: -2px;
+  width: 4px;
+  height: 2px;
+  background: var(--Speech-Bubble-Border);
 }
