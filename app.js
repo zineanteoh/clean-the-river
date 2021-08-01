@@ -1,3 +1,10 @@
+import Duck from "./duck.js";
+import {
+  getRandomDuckPhrase,
+  getRandomPositivePhrase,
+  getRandomEncouragement,
+} from "./duck.js";
+
 // Most commonly used variables
 let selectedRubbish = []; // keeps track of the selected rubbish that are in equation
 let numberCount = 0; // keeps track of how many 'numbers' are in river
@@ -18,45 +25,8 @@ let initiateRubbishID; // id to clear interval
 let rubbishIntervalID; // id to clear interval
 let isGameRunning = true;
 
-// Random duck phrases
-const duckPhrases = [
-  "Can you help me clean the river?",
-  "#savetheplanet",
-  "it's weird that a duck can speak right?",
-  "Back in the days, rivers used to be clean",
-  "Keep working on improving yourself",
-  "The rubbish never end!",
-  "Can elon musk send ducks to space?",
-  "How do you find meaning in life?",
-  // "Why am I here?",
-  "I am determined to clean the river!",
-  "quack.",
-  "if life gives you lemon, don't throw it into the river",
-  "Be a good person",
-];
-
-const encouragement = [
-  "It's okay, try again!",
-  "You won't grow if you never fail!",
-  "I believe in you. Try that again",
-  "hey! it's good that you're making mistakes!",
-  "keeeeep trying!!!",
-  "you got this! give it your best!",
-];
-
-const positivePhrases = [
-  "You're doing a great job",
-  "Nice work!",
-  "That's good! Keep going!",
-  "Your brain is working like a machine!",
-  "Are you, perhaps, Einstein?",
-  "I'm just a duck, but I'm impressed!",
-  "Keep up the good work, my friend",
-  "i hope you are having fun",
-];
-
-animateDuck();
-animateDuck.wander();
+const duck = new Duck();
+duck.wander();
 animationLoop();
 addEventListeners();
 
@@ -84,9 +54,9 @@ function addEventListeners() {
       document.querySelector(".hud").classList.remove("hidden");
       // Start Game
       startGame(symbolList, difficulty, lives);
-      animateDuck.speak("Here comes the rubbish!!");
+      duck.speak("Here comes the rubbish!!");
     } else {
-      animateDuck.speak("Select at least ONE symbol!");
+      duck.speak("Select at least ONE symbol!");
     }
   });
 
@@ -170,7 +140,7 @@ function returnHome() {
   }
   initiateRubbishID = undefined; // id to clear interval
   rubbishIntervalID = undefined; // id to clear interval
-  animateDuck.speak(getRandomDuckPhrase());
+  duck.speak(getRandomDuckPhrase());
 }
 
 // Adds event listeners to allow user to interact with objects
@@ -426,7 +396,7 @@ function validateEquation() {
   }
   if (eval(left.replace("x", "*")) == eval(right)) {
     // Right answer!
-    animateDuck.speak(getRandomPositivePhrase());
+    duck.speak(getRandomPositivePhrase());
     console.log("Correct! " + left + " = " + eval(right));
     score++;
     symbolCount--;
@@ -438,8 +408,8 @@ function validateEquation() {
     cleanRubbish();
   } else {
     // Wrong answer!
-    animateDuck.fallsDown();
-    animateDuck.speak(getRandomEncouragement());
+    duck.fallsDown();
+    duck.speak(getRandomEncouragement());
     // console.log("Oops Wrong Answer! " + left + " is not " + eval(right));
     addEquationLog(
       left + "= " + "<span class='wrong-wavy'>" + eval(right) + "*</span>",
@@ -469,128 +439,4 @@ function clearEquation() {
     equation.children[i].textContent = "";
   }
   equation.lastElementChild.value = "";
-}
-
-// Animate Duck
-function animateDuck() {
-  let duckImg = document.getElementById("duck-img");
-  let duck = document.querySelector(".duck");
-
-  let moveID; // variable to clear setInterval()
-  let isPaused = false;
-  let isFacingRight = true; // keeps track of which direction duck is facing
-  const interval = 200; // 200 ms of interval for setInterval()
-  const steps = 1; // number of steps taken for each walk function called
-
-  duck.style.left = "18%"; // set duck's initial position
-
-  function speak(text) {
-    document.querySelector("#speech-txt").textContent = text;
-  }
-
-  function wander() {
-    clearInterval(moveID);
-    moveID = setInterval(() => {
-      if (!isPaused) {
-        // Rolls dice
-        let diceRoll = Math.floor(Math.random() * 6);
-        // 50% chance of moving (if even)
-        if (diceRoll % 2 == 0) {
-          // for now, move left
-          if (isFacingRight) {
-            walkLeft();
-          } else {
-            walkRight();
-          }
-        }
-      }
-    }, interval * 10);
-  }
-
-  function walkLeft() {
-    let count = 0;
-    let pos = 12;
-    if (isFacingRight) {
-      // Flip image horizontally
-      duckImg.style.transform = "scale(7.0) scaleX(-1)";
-    }
-    isFacingRight = false;
-    let tempID = setInterval(() => {
-      duckImg.style.backgroundPosition = `-${pos}px 0px`;
-      if (pos < 36) {
-        pos += 12;
-      } else {
-        pos = 12;
-      }
-      duck.style.left = parseFloat(duck.style.left) - steps + "%";
-      count++;
-      if (count > 5) {
-        clearInterval(tempID);
-        duckImg.style.backgroundPosition = `0px 0px`;
-      }
-    }, interval);
-  }
-
-  function walkRight() {
-    let count = 0;
-    let pos = 12;
-    if (!isFacingRight) {
-      // Flip image horizontally
-      duckImg.style.transform = "scale(7.0) scaleX(1)";
-    }
-    isFacingRight = true;
-    let tempID = setInterval(() => {
-      duckImg.style.backgroundPosition = `-${pos}px 0px`;
-      if (pos < 36) {
-        pos += 12;
-      } else {
-        pos = 12;
-      }
-      duck.style.left = parseFloat(duck.style.left) + steps + "%";
-      count++;
-      if (count > 5) {
-        clearInterval(tempID);
-        duckImg.style.backgroundPosition = `0px 0px`;
-      }
-    }, interval);
-  }
-
-  function fallsDown() {
-    isPaused = true;
-    let count = 0;
-    let pos = 12;
-    let tempID = setInterval(() => {
-      duckImg.style.backgroundPosition = `-${pos}px -12px`;
-      if (pos < 24) {
-        pos += 12;
-      } else {
-        pos = 0;
-      }
-      count++;
-      if (count > 3) {
-        isPaused = false;
-        clearInterval(tempID);
-        duckImg.style.backgroundPosition = `0px 0px`;
-      }
-    }, interval * 5);
-  }
-
-  // Allow subfunctions to be called from outside
-  animateDuck.speak = speak;
-  animateDuck.wander = wander;
-  animateDuck.walkLeft = walkLeft;
-  animateDuck.walkRight = walkRight;
-  animateDuck.fallsDown = fallsDown;
-}
-
-function getRandomDuckPhrase() {
-  return duckPhrases[Math.floor(Math.random() * duckPhrases.length)];
-}
-
-function getRandomPositivePhrase() {
-  return positivePhrases[Math.floor(Math.random() * positivePhrases.length)];
-}
-
-function getRandomEncouragement() {
-  return encouragement[Math.floor(Math.random() * encouragement.length)];
 }
