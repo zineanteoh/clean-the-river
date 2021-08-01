@@ -4,6 +4,7 @@ import {
   getRandomPositivePhrase,
   getRandomEncouragement,
 } from "./src/duck.js";
+// import { loadAudio, playAudio, runAudio } from "./src/audio.js";
 
 // Most commonly used variables
 let selectedRubbish = []; // keeps track of the selected rubbish that are in equation
