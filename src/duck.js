@@ -18,7 +18,6 @@ const duckPhrases = [
   "The rubbish never end!",
   "Can elon musk send ducks to space?",
   "How do you find meaning in life?",
-  // "Why am I here?",
   "I am determined to clean the river!",
   "quack.",
   "if life gives you lemon, don't throw it into the river",

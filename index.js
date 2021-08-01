@@ -1,9 +1,9 @@
-import Duck from "./duck.js";
+import Duck from "./src/duck.js";
 import {
   getRandomDuckPhrase,
   getRandomPositivePhrase,
   getRandomEncouragement,
-} from "./duck.js";
+} from "./src/duck.js";
 
 // Most commonly used variables
 let selectedRubbish = []; // keeps track of the selected rubbish that are in equation
