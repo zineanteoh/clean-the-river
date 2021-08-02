@@ -1,6 +1,6 @@
 // Plays music.wav during gameplay
 
-const url = "../audio/music.wav";
+const url = "./audio/music.wav";
 let audioElement;
 const controlMusic = document.querySelector(".control-music");
 let isPlaying = false;
