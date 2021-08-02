@@ -4,7 +4,7 @@ import {
   getRandomPositivePhrase,
   getRandomEncouragement,
 } from "./src/duck.js";
-// import { loadAudio, playAudio, runAudio } from "./src/audio.js";
+import { loadAudio, playAudio, stopAudio } from "./src/audio.js";
 
 // Most commonly used variables
 let selectedRubbish = []; // keeps track of the selected rubbish that are in equation
@@ -25,6 +25,9 @@ let rubbishFlowRate = 4; // rubbish flow rate. 4 is ideal
 let initiateRubbishID; // id to clear interval
 let rubbishIntervalID; // id to clear interval
 let isGameRunning = true;
+
+// Load music
+loadAudio();
 
 const duck = new Duck();
 duck.wander();
@@ -56,6 +59,7 @@ function addEventListeners() {
       // Start Game
       startGame(symbolList, difficulty, lives);
       duck.speak("Here comes the rubbish!!");
+      playAudio();
     } else {
       duck.speak("Select at least ONE symbol!");
     }
@@ -64,6 +68,7 @@ function addEventListeners() {
   // Add event listener to allow user to exit game
   document.querySelector(".return-home").addEventListener("click", function () {
     returnHome();
+    stopAudio();
   });
 }
 
