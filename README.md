@@ -12,4 +12,4 @@ Children between 6 to 12 years old studying basic algebra (addition, subtraction
 
 ## Demo
 
-![Demo of gameplay](https://i.imgur.com/tyTAkeL.gif)
+![Demo of gameplay](https://i.imgur.com/XgFiKaq.gif)
