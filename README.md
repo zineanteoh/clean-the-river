@@ -1,5 +1,7 @@
 # Clean The River, A Mathematics Game
 
+Submitted to itch.io game jam: https://zineanteoh.itch.io/clean-the-river
+
 ## Description:
 
 A web-based game that lets children practice forming and solving basic mathematical expressions by "cleaning the river"
